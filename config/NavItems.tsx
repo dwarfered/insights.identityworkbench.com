@@ -22,20 +22,6 @@ export const navConfig: NavItem[] = [
     showActiveIcon: true,
   },
   {
-    label: 'Organization',
-    route: '/organization',
-    icon: <OrgColor />,
-    showActiveIcon: true,
-    requiresAuth: true,
-  },
-  {
-    label: 'Profile',
-    route: '/profile',
-    icon: <PersonColor />,
-    showActiveIcon: true,
-    requiresAuth: true,
-  },
-  {
     label: 'Licensing',
     route: '/licensing',
     icon: <CertificateColor />,

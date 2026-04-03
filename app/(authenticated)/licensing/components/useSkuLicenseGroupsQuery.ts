@@ -9,6 +9,12 @@ export type GroupWithMemberCount = {
   memberCount: number | null;
 };
 
+type GraphGroup = {
+  id: string;
+  displayName?: string | null;
+  description?: string | null;
+};
+
 async function fetchGroupsForSku(
   skuId: string,
 ): Promise<GroupWithMemberCount[]> {
@@ -22,7 +28,22 @@ async function fetchGroupsForSku(
     consistencyLevel: 'eventual',
   });
 
-  const groups = Array.isArray(data.value) ? data.value : [];
+  const rawGroups: unknown[] = Array.isArray(data.value) ? data.value : [];
+  const groups = rawGroups.filter((group): group is GraphGroup => {
+    if (typeof group !== 'object' || group === null) {
+      return false;
+    }
+    const maybeGroup = group as Record<string, unknown>;
+    return (
+      typeof maybeGroup.id === 'string' &&
+      (maybeGroup.displayName === undefined ||
+        maybeGroup.displayName === null ||
+        typeof maybeGroup.displayName === 'string') &&
+      (maybeGroup.description === undefined ||
+        maybeGroup.description === null ||
+        typeof maybeGroup.description === 'string')
+    );
+  });
 
   const groupsWithCounts = await Promise.all(
     groups.map(async (group) => {

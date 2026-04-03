@@ -8,6 +8,8 @@ import {
 import { msGraphEndpoints } from '@/quickstart/providers/msgraph/msGraphEndpoints';
 import { msGraphFetcher } from '@/quickstart/providers/msgraph/msGraphFetcher';
 
+// This is an expensive query, not using SWR for auto fetching.
+
 export type EmployeeTypeBreakdown = {
   totalAssigned: number;
   buckets: Array<{ label: string; count: number }>;
