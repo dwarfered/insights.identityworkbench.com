@@ -1,3 +1,5 @@
+> **Context:** this repo is my working clone of [nextjs-msal-react-graph-spa-template](https://github.com/dwarfered/nextjs-msal-react-graph-spa-template), repurposed to power the **Insights – Identity Workbench** landing page and showcase the Entra-focused Graph queries highlighted there. Everything below comes straight from that template.
+
 # Next.js MSAL React SPA Template (Microsoft Entra ID + Microsoft Graph)
 
 > A production-ready Next.js React SPA template for Microsoft Entra ID authentication using MSAL and Microsoft Graph.
@@ -10,7 +12,7 @@ It provides a clean, working foundation to sign users in, acquire delegated toke
 Built to reflect how identity-enabled applications are actually implemented, not just how they are documented.
 
 [![Next.js](https://img.shields.io/badge/Next.js-App%20Router-blue)](https://github.com/vercel/next.js)
-[![Auth](https://img.shields.io/badge/Auth-MS%20Entra%20ID%20(MSAL)-blueviolet)](https://github.com/AzureAD/microsoft-authentication-library-for-js/tree/dev/lib/msal-react)
+[![Auth](<https://img.shields.io/badge/Auth-MS%20Entra%20ID%20(MSAL)-blueviolet>)](https://github.com/AzureAD/microsoft-authentication-library-for-js/tree/dev/lib/msal-react)
 [![Microsoft Graph](https://img.shields.io/badge/API-Microsoft%20Graph-blue)](https://github.com/microsoftgraph/msgraph-sdk-javascript)
 [![Fluent UI](https://img.shields.io/badge/UI-Fluent%20UI-ff69b4)](https://github.com/microsoft/fluentui)
 [![License](https://img.shields.io/github/license/dwarfered/nextjs-msal-react-graph-spa-template)](...)
@@ -43,6 +45,7 @@ If it saves you time or helps you avoid common pitfalls, it’s done its job.
 This is a browser-based SPA. Anything shipped to the client should be treated as public.
 
 Do not include:
+
 - Secrets (client secrets, API keys, certificates)
 - Sensitive logic or decision-making
 - Server-side enforcement of access controls
