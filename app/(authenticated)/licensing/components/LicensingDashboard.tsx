@@ -65,6 +65,8 @@ const useStyles = makeStyles({
     display: 'flex',
     flexDirection: 'column',
     gap: tokens.spacingVerticalM,
+    width: '100%',
+    minWidth: 0,
   },
   headerRow: {
     display: 'flex',
@@ -123,10 +125,12 @@ const useStyles = makeStyles({
     display: 'flex',
     flexDirection: 'column',
     gap: tokens.spacingVerticalS,
-  },
-  breakdownChart: {
     width: '100%',
-    height: '280px',
+    minWidth: 0,
+  },
+  breakdownChartWrapper: {
+    width: '100%',
+    minWidth: 0,
   },
   insightsRow: {
     display: 'grid',
@@ -458,8 +462,8 @@ function SkuEmployeeTypeBreakdownCard({ skuId }: { skuId: string }) {
       ) : breakdown ? (
         <div className={styles.breakdownList}>
           {chartData.length ? (
-            <div className={styles.breakdownChart}>
-              <ResponsiveContainer width='100%' height='100%'>
+            <div className={styles.breakdownChartWrapper}>
+              <ResponsiveContainer width='100%' height={320}>
                 <BarChart
                   data={chartData}
                   margin={{ top: 12, right: 16, left: 4, bottom: 32 }}
