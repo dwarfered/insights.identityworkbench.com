@@ -5,8 +5,9 @@ import {
   Body1,
   Button,
   Link,
-  Title1,
   Subtitle2,
+  Text,
+  Title1,
   makeStyles,
   shorthands,
   tokens,
@@ -39,6 +40,14 @@ const useStyles = makeStyles({
     paddingLeft: '20px',
     margin: 0,
   },
+  featureCard: {
+    ...shorthands.padding(tokens.spacingHorizontalM),
+    borderRadius: tokens.borderRadiusLarge,
+    backgroundColor: tokens.colorNeutralBackground3,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: tokens.spacingVerticalXXS,
+  },
 });
 
 const resourceLinks = [
@@ -56,6 +65,24 @@ const resourceLinks = [
   },
 ];
 
+const featureHighlights = [
+  {
+    title: 'Targeted licensing insights',
+    description:
+      'Run focused Graph queries to surface SKU assignment, group targeting, and actions to make license reviews faster.',
+  },
+  {
+    title: 'Actionable breakdowns',
+    description:
+      'Drill into employee-type splits, group ownership, and member counts so you can align license decisions.',
+  },
+  {
+    title: 'Reusable Graph patterns',
+    description:
+      'Every hook doubles as sample code-clone, adapt, or extend them in your own Entra management automations.',
+  },
+];
+
 export default function Home() {
   const styles = useStyles();
   const router = useRouter();
@@ -63,17 +90,26 @@ export default function Home() {
   return (
     <ClientShell>
       <section className={styles.hero}>
-        <Title1>Next.js + MSAL React + Microsoft Graph quickstart</Title1>
+        <Title1>Insights - Identity Workbench</Title1>
         <br />
         <Body1 style={{ marginTop: tokens.spacingVerticalS }}>
-          Easily build a single or multi-tenant Next.js React SPA that
-          authenticates against Microsoft Entra ID, calls Microsoft Graph with
-          resilient SWR hooks, and showcases real user + organization data out
-          of the box.
+          A living showcase of Microsoft Graph queries and actions that assist
+          Entra administrators with day-to-day tenant management.
         </Body1>
         <div className={styles.heroActions}>
-          <Button appearance='primary' onClick={() => router.push('/profile')}>
-            View Graph profile sample
+          <Button
+            appearance='primary'
+            onClick={() => router.push('/licensing')}
+          >
+            Explore licensing insights
+          </Button>
+          <Button
+            as='a'
+            href='https://github.com/dwarfered/insights.identityworkbench.com'
+            target='_blank'
+            rel='noreferrer'
+          >
+            View Insights source
           </Button>
           <Button
             as='a'
@@ -81,8 +117,20 @@ export default function Home() {
             target='_blank'
             rel='noreferrer'
           >
-            Open README
+            View template source
           </Button>
+        </div>
+      </section>
+
+      <section className={styles.section}>
+        <Subtitle2>What this Insights project highlights</Subtitle2>
+        <div className={styles.featureGrid}>
+          {featureHighlights.map((feature) => (
+            <div key={feature.title} className={styles.featureCard}>
+              <Text weight='semibold'>{feature.title}</Text>
+              <Body1>{feature.description}</Body1>
+            </div>
+          ))}
         </div>
       </section>
 
