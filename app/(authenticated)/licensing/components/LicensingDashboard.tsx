@@ -14,6 +14,16 @@ import {
   makeStyles,
   tokens,
 } from '@fluentui/react-components';
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  LabelList,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 import { useSkuLicenseGroupsQuery } from './useSkuLicenseGroupsQuery';
 import { useSkuEmployeeTypeBreakdown } from './useSkuEmployeeTypeBreakdown';
 
@@ -109,6 +119,10 @@ const useStyles = makeStyles({
     display: 'flex',
     flexDirection: 'column',
     gap: tokens.spacingVerticalS,
+  },
+  breakdownChart: {
+    width: '100%',
+    height: '280px',
   },
   insightsRow: {
     display: 'grid',
@@ -328,7 +342,7 @@ function SkuLicenseGroupsCard({ skuId }: { skuId: string }) {
     <Card>
       <CardHeader
         header={<Text weight='semibold'>Groups assigning this license</Text>}
-        description={`${groups.length} group${groups.length === 1 ? '' : 's'} apply this SKU`}
+        description={`${groups.length} group${groups.length === 1 ? '' : 's'} applies this license`}
       />
       <div className={styles.groupList}>
         {groups.map((group) => (
@@ -364,11 +378,19 @@ function SkuEmployeeTypeBreakdownCard({ skuId }: { skuId: string }) {
 
   const { breakdown, isLoading, error, isCancelled, cancel, progress } =
     useSkuEmployeeTypeBreakdown(skuId, requestId > 0, requestId);
+  const chartData = React.useMemo(
+    () =>
+      breakdown?.buckets.map((bucket) => ({
+        label: bucket.label,
+        count: bucket.count,
+      })) ?? [],
+    [breakdown],
+  );
 
   return (
     <Card>
       <CardHeader
-        header={<Text weight='semibold'>Load employee type breakdown</Text>}
+        header={<Text weight='semibold'>Employee type breakdown</Text>}
         description='User counts by employee type for this license.'
       />
       {requestId === 0 ? (
@@ -419,6 +441,55 @@ function SkuEmployeeTypeBreakdownCard({ skuId }: { skuId: string }) {
         </>
       ) : breakdown ? (
         <div className={styles.breakdownList}>
+          {chartData.length ? (
+            <div className={styles.breakdownChart}>
+              <ResponsiveContainer width='100%' height='100%'>
+                <BarChart
+                  data={chartData}
+                  margin={{ top: 12, right: 16, left: 4, bottom: 32 }}
+                >
+                  <CartesianGrid
+                    strokeDasharray='3 3'
+                    stroke={tokens.colorNeutralStroke2}
+                  />
+                  <XAxis
+                    dataKey='label'
+                    interval={0}
+                    angle={-20}
+                    textAnchor='end'
+                    height={60}
+                    tick={{ fill: tokens.colorNeutralForeground2 }}
+                  />
+                  <YAxis
+                    allowDecimals={false}
+                    tick={{ fill: tokens.colorNeutralForeground2 }}
+                  />
+                  <Tooltip
+                    cursor={{ fill: 'transparent' }}
+                    labelStyle={{ color: tokens.colorNeutralForeground1 }}
+                    contentStyle={{
+                      borderRadius: tokens.borderRadiusMedium,
+                      border: `1px solid ${tokens.colorNeutralStroke2}`,
+                    }}
+                  />
+                  <Bar
+                    dataKey='count'
+                    fill={tokens.colorPaletteBlueBackground2}
+                    radius={[6, 6, 0, 0]}
+                  >
+                    <LabelList
+                      dataKey='count'
+                      position='top'
+                      style={{
+                        fill: tokens.colorNeutralForeground1,
+                        fontWeight: 600,
+                      }}
+                    />
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          ) : null}
           {/* <Text size={200} className={styles.groupMeta}>
             Total licensed users: {breakdown.totalAssigned}
           </Text> */}
