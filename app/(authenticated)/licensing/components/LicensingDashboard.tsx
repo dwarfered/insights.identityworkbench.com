@@ -7,6 +7,7 @@ import {
   Card,
   CardHeader,
   Dropdown,
+  Link,
   Option,
   ProgressBar,
   Spinner,
@@ -115,6 +116,9 @@ const useStyles = makeStyles({
   groupMeta: {
     color: tokens.colorNeutralForeground3,
   },
+  groupLink: {
+    fontWeight: 600,
+  },
   breakdownList: {
     display: 'flex',
     flexDirection: 'column',
@@ -156,6 +160,13 @@ function getStatusAppearance(
     default:
       return 'outline';
   }
+}
+
+const ENTRA_GROUP_URL_BASE =
+  'https://entra.microsoft.com/#view/Microsoft_AAD_IAM/GroupDetailsMenuBlade/~/Overview/groupId/';
+
+function getEntraGroupUrl(groupId: string) {
+  return `${ENTRA_GROUP_URL_BASE}${encodeURIComponent(groupId)}`;
 }
 
 export function LicensingDashboard({ skus }: { skus: SkuUsageModel[] }) {
@@ -348,9 +359,14 @@ function SkuLicenseGroupsCard({ skuId }: { skuId: string }) {
         {groups.map((group) => (
           <div key={group.id} className={styles.groupRow}>
             <div className={styles.groupNameBlock}>
-              <Text weight='semibold'>
+              <Link
+                href={getEntraGroupUrl(group.id)}
+                target='_blank'
+                rel='noreferrer'
+                className={styles.groupLink}
+              >
                 {group.displayName ?? 'Unnamed group'}
-              </Text>
+              </Link>
               {group.description ? (
                 <Text size={200} className={styles.groupMeta}>
                   {group.description}
