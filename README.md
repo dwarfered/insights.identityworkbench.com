@@ -1,4 +1,23 @@
-> **Context:** this repo is my working clone of [nextjs-msal-react-graph-spa-template](https://github.com/dwarfered/nextjs-msal-react-graph-spa-template), repurposed to power the **Insights – Identity Workbench** landing page and showcase the Entra-focused Graph queries highlighted there. Everything below comes straight from that template.
+# Insights - Identity  Workbench
+
+## Entra Licensing Dashboard
+
+The native licensing experience in admin.microsoft.com can become slow and difficult to work with in large tenants.
+
+This dashboard aims to reduce that friction by using optimised Microsoft Graph queries to surface licensing data in a more responsive and usable way.
+
+Added licensing-focused insights to show how licenses are assigned and consumed across the tenant.
+
+These views are designed to make it easier to understand:
+- Which users are assigned specific SKUs
+- How licenses are distributed across employee types (e.g. employee, contractor, service accounts)
+- Which groups are being used to assign licenses
+
+<p align="center">
+  <img src="./public/docs/insights-hero.png" alt="Insights dashboard" width="800" />
+</p>
+
+> **Context:** this repo is my working clone of [nextjs-msal-react-graph-spa-template](https://github.com/dwarfered/nextjs-msal-react-graph-spa-template), repurposed to power the **Insights - Identity Workbench** landing page and showcase the Entra-focused Graph queries highlighted there. Everything below comes straight from that template.
 
 # Next.js MSAL React SPA Template (Microsoft Entra ID + Microsoft Graph)
 
