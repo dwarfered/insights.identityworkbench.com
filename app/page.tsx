@@ -79,12 +79,12 @@ const featureHighlights = [
   {
     title: 'Actionable breakdowns',
     description:
-      'See employee-type splits, group ownership, and member counts for easy governance.',
+      'See employee-type splits, group iherited licenses, and member counts.',
   },
   {
     title: 'Reusable Graph patterns',
     description:
-      'Technically, each hook doubles as copy-paste ready sample code for your next Entra automation.',
+      'Technically, each hook doubles as copy-paste ready sample code for your own instance of this app.',
   },
 ];
 
@@ -99,8 +99,8 @@ export default function Home() {
         <br />
         <Body1 style={{ marginTop: tokens.spacingVerticalS }}>
           This is my sandbox for trying Microsoft Graph ideas that make Entra
-          management easier. The samples are practical, opinionated, and easy to
-          take for your own tenant.
+          management easier. The samples are practical, and easy to take for
+          your own tenant.
         </Body1>
         <div className={styles.heroActions}>
           <Button
