@@ -1,4 +1,9 @@
-import { HomeColor, OrgColor, PersonColor } from '@fluentui/react-icons';
+import {
+  CertificateColor,
+  HomeColor,
+  OrgColor,
+  PersonColor,
+} from '@fluentui/react-icons';
 
 interface NavItem {
   label: string;
@@ -27,6 +32,13 @@ export const navConfig: NavItem[] = [
     label: 'Profile',
     route: '/profile',
     icon: <PersonColor />,
+    showActiveIcon: true,
+    requiresAuth: true,
+  },
+  {
+    label: 'Licensing',
+    route: '/licensing',
+    icon: <CertificateColor />,
     showActiveIcon: true,
     requiresAuth: true,
   },
