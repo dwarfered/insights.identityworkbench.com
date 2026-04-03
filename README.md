@@ -1,17 +1,25 @@
-# Insights - Identity  Workbench
+# Insights - Identity Workbench
 
-## Entra Licensing Dashboard
+## Entra Licensing
 
 The native licensing experience in admin.microsoft.com can become slow and difficult to work with in large tenants.
 
 This dashboard aims to reduce that friction by using optimised Microsoft Graph queries to surface licensing data in a more responsive and usable way.
 
-Added licensing-focused insights to show how licenses are assigned and consumed across the tenant.
+3/4/26 Added licensing-focused insights to show how licenses are assigned and consumed across the tenant.
 
 These views are designed to make it easier to understand:
+
 - Which users are assigned specific SKUs
 - How licenses are distributed across employee types (e.g. employee, contractor, service accounts)
 - Which groups are being used to assign licenses
+
+## Pending Actions
+
+The following views are planned but not yet implemented:
+
+- License assignment failures
+- Pending license assignment actions
 
 <p align="center">
   <img src="./public/docs/insights-hero.png" alt="Insights dashboard" width="800" />
