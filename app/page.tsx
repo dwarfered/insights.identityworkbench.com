@@ -69,17 +69,17 @@ const featureHighlights = [
   {
     title: 'Targeted licensing insights',
     description:
-      'Run focused Graph queries to surface SKU assignment, group targeting, and actions to make license reviews faster.',
+      'Quick Graph queries that surface SKU assignments, targeting, and show the current landscape.',
   },
   {
     title: 'Actionable breakdowns',
     description:
-      'Drill into employee-type splits, group ownership, and member counts so you can align license decisions.',
+      'See employee-type splits, group ownership, and member counts for easy governance.',
   },
   {
     title: 'Reusable Graph patterns',
     description:
-      'Every hook doubles as sample code-clone, adapt, or extend them in your own Entra management automations.',
+      'Technically, each hook doubles as copy-paste ready sample code for your next Entra automation.',
   },
 ];
 
@@ -93,8 +93,9 @@ export default function Home() {
         <Title1>Insights - Identity Workbench</Title1>
         <br />
         <Body1 style={{ marginTop: tokens.spacingVerticalS }}>
-          A living showcase of Microsoft Graph queries and actions that assist
-          Entra administrators with day-to-day tenant management.
+          This is my sandbox for trying Microsoft Graph ideas that make Entra
+          management easier. The samples are practical, opinionated, and easy to
+          take for your own tenant.
         </Body1>
         <div className={styles.heroActions}>
           <Button
@@ -123,7 +124,7 @@ export default function Home() {
       </section>
 
       <section className={styles.section}>
-        <Subtitle2>What this Insights project highlights</Subtitle2>
+        <Subtitle2>What you'll find inside</Subtitle2>
         <div className={styles.featureGrid}>
           {featureHighlights.map((feature) => (
             <div key={feature.title} className={styles.featureCard}>
