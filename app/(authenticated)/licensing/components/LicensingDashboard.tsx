@@ -176,24 +176,31 @@ function getEntraGroupUrl(groupId: string) {
 export function LicensingDashboard({ skus }: { skus: SkuUsageModel[] }) {
   const styles = useStyles();
   const [selectedSkuId, setSelectedSkuId] = React.useState<string | null>(null);
+  const sortedSkus = React.useMemo(() => {
+    return [...skus].sort((a, b) => {
+      const labelA = (a.displayName ?? a.skuPartNumber).toLowerCase();
+      const labelB = (b.displayName ?? b.skuPartNumber).toLowerCase();
+      return labelA.localeCompare(labelB);
+    });
+  }, [skus]);
 
   React.useEffect(() => {
-    if (!skus.length) {
+    if (!sortedSkus.length) {
       setSelectedSkuId(null);
       return;
     }
 
     setSelectedSkuId((prev) => {
-      if (prev && skus.some((sku) => sku.skuId === prev)) {
+      if (prev && sortedSkus.some((sku) => sku.skuId === prev)) {
         return prev;
       }
 
       return null;
     });
-  }, [skus]);
+  }, [sortedSkus]);
 
   const selectedSku = selectedSkuId
-    ? skus.find((sku) => sku.skuId === selectedSkuId)
+    ? sortedSkus.find((sku) => sku.skuId === selectedSkuId)
     : undefined;
 
   return (
@@ -202,7 +209,7 @@ export function LicensingDashboard({ skus }: { skus: SkuUsageModel[] }) {
         <Text weight='semibold'>Select a license SKU</Text>
         <Dropdown
           placeholder='Select a license SKU'
-          disabled={!skus.length}
+          disabled={!sortedSkus.length}
           selectedOptions={selectedSkuId ? [selectedSkuId] : []}
           onOptionSelect={(_, data) => {
             const optionValue = data.optionValue;
@@ -211,7 +218,7 @@ export function LicensingDashboard({ skus }: { skus: SkuUsageModel[] }) {
             }
           }}
         >
-          {skus.map((sku) => (
+          {sortedSkus.map((sku) => (
             <Option key={sku.skuId} value={sku.skuId}>
               {sku.displayName
                 ? `${sku.displayName} (${sku.skuPartNumber})`
