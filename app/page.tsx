@@ -40,6 +40,10 @@ const useStyles = makeStyles({
     paddingLeft: '20px',
     margin: 0,
   },
+  sectionHeading: {
+    display: 'block',
+    marginBottom: tokens.spacingVerticalXL,
+  },
   featureCard: {
     ...shorthands.padding(tokens.spacingHorizontalM),
     borderRadius: tokens.borderRadiusLarge,
@@ -124,7 +128,9 @@ export default function Home() {
       </section>
 
       <section className={styles.section}>
-        <Subtitle2>What you'll find inside</Subtitle2>
+        <Subtitle2 className={styles.sectionHeading}>
+          What you'll find inside
+        </Subtitle2>
         <div className={styles.featureGrid}>
           {featureHighlights.map((feature) => (
             <div key={feature.title} className={styles.featureCard}>
@@ -136,7 +142,9 @@ export default function Home() {
       </section>
 
       <section className={styles.section}>
-        <Subtitle2>Deep-dive resources</Subtitle2>
+        <Subtitle2 className={styles.sectionHeading}>
+          Deep-dive resources
+        </Subtitle2>
         <ul className={styles.resourceList}>
           {resourceLinks.map((link) => (
             <li key={link.href}>
