@@ -74,17 +74,16 @@ const featureHighlights = [
   {
     title: 'Targeted licensing insights',
     description:
-      'Quick Graph queries that surface SKU assignments, targeting, and show the current landscape.',
+      'Efficient Microsoft Graph queries, surfacing SKU assignments and the current landscape.',
   },
   {
     title: 'Actionable breakdowns',
-    description:
-      'See employee-type splits, group iherited licenses, and member counts.',
+    description: 'Employee types, group-based licensing, and member counts.',
   },
   {
-    title: 'Reusable Graph patterns',
+    title: 'Reusable Microsoft Graph patterns',
     description:
-      'Technically, each hook doubles as copy-paste ready sample code for your own instance of this app.',
+      'Each component is a copy-paste ready sample for your own automation or insights apps.',
   },
 ];
 
@@ -130,7 +129,7 @@ export default function Home() {
 
       <section className={styles.section}>
         <Subtitle2 className={styles.sectionHeading}>
-          What you'll find inside
+          What you'll find so far
         </Subtitle2>
         <div className={styles.featureGrid}>
           {featureHighlights.map((feature) => (
