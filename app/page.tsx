@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import {
   Body1,
@@ -139,6 +140,24 @@ export default function Home() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className={styles.section}>
+        <Subtitle2 className={styles.sectionHeading}>
+          Example signed-in session
+        </Subtitle2>
+        <Image
+          src='/docs/insights-hero.png'
+          alt='Insights licensing dashboard'
+          width={2266}
+          height={1746}
+          style={{
+            width: '100%',
+            height: 'auto',
+            borderRadius: tokens.borderRadiusXLarge,
+          }}
+          priority
+        />
       </section>
 
       <section className={styles.section}>
