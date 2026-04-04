@@ -7,6 +7,7 @@ import {
   Card,
   CardHeader,
   Dropdown,
+  InfoLabel,
   Link,
   Option,
   ProgressBar,
@@ -97,6 +98,11 @@ const useStyles = makeStyles({
     flexDirection: 'column',
     gap: tokens.spacingVerticalXXS,
   },
+  metricInfoLabel: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    columnGap: tokens.spacingHorizontalXXS,
+  },
   groupList: {
     display: 'flex',
     flexDirection: 'column',
@@ -172,6 +178,15 @@ const ENTRA_GROUP_URL_BASE =
 function getEntraGroupUrl(groupId: string) {
   return `${ENTRA_GROUP_URL_BASE}${encodeURIComponent(groupId)}`;
 }
+
+const skuMetricDescriptions = {
+  warning:
+    'These seats exceed what you purchased. Microsoft keeps them active for a short grace period so you can reclaim or buy more.',
+  suspended:
+    'Microsoft temporarily disabled the SKU for your tenant, often for billing or policy reasons. Assigned users cannot access it until resolved.',
+  lockedOut:
+    'Access to the SKU is fully blocked. Users cannot sign in with it until Microsoft removes the lock after billing/compliance issues are fixed.',
+};
 
 export function LicensingDashboard({ skus }: { skus: SkuUsageModel[] }) {
   const styles = useStyles();
@@ -297,23 +312,38 @@ function SkuUsageCard({ sku }: { sku: SkuUsageModel }) {
         </div>
 
         <div className={styles.metric}>
-          <Text size={200} className={styles.subText}>
-            Warning
-          </Text>
+          <InfoLabel
+            info={skuMetricDescriptions.warning}
+            className={styles.metricInfoLabel}
+          >
+            <Text size={200} className={styles.subText}>
+              Warning
+            </Text>
+          </InfoLabel>
           <Text weight='semibold'>{sku.warning}</Text>
         </div>
 
         <div className={styles.metric}>
-          <Text size={200} className={styles.subText}>
-            Suspended
-          </Text>
+          <InfoLabel
+            info={skuMetricDescriptions.suspended}
+            className={styles.metricInfoLabel}
+          >
+            <Text size={200} className={styles.subText}>
+              Suspended
+            </Text>
+          </InfoLabel>
           <Text weight='semibold'>{sku.suspended}</Text>
         </div>
 
         <div className={styles.metric}>
-          <Text size={200} className={styles.subText}>
-            Locked out
-          </Text>
+          <InfoLabel
+            info={skuMetricDescriptions.lockedOut}
+            className={styles.metricInfoLabel}
+          >
+            <Text size={200} className={styles.subText}>
+              Locked out
+            </Text>
+          </InfoLabel>
           <Text weight='semibold'>{sku.lockedOut}</Text>
         </div>
       </div>
