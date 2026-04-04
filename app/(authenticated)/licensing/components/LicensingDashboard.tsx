@@ -103,6 +103,10 @@ const useStyles = makeStyles({
     alignItems: 'center',
     columnGap: tokens.spacingHorizontalXXS,
   },
+  statusInfoLabel: {
+    display: 'inline-flex',
+    alignItems: 'center',
+  },
   groupList: {
     display: 'flex',
     flexDirection: 'column',
@@ -181,11 +185,18 @@ function getEntraGroupUrl(groupId: string) {
 
 const skuMetricDescriptions = {
   warning:
-    'These seats exceed what you purchased. Microsoft keeps them active for a short grace period so you can reclaim or buy more.',
+    'Subscription expired but still in the Microsoft grace window. Units stay active until the customer renews or the state changes to suspended.',
   suspended:
-    'Microsoft temporarily disabled the SKU for your tenant, often for billing or policy reasons. Assigned users cannot access it until resolved.',
+    'Subscription was canceled; units can no longer be assigned but can still be reactivated before Microsoft permanently deletes them.',
   lockedOut:
-    'Access to the SKU is fully blocked. Users cannot sign in with it until Microsoft removes the lock after billing/compliance issues are fixed.',
+    'Subscription was canceled and fully locked. Units can’t be reactivated or assigned unless the customer purchases the SKU again.',
+};
+
+const capabilityStatusDescriptions: Record<string, string> = {
+  Warning:
+    'Microsoft flagged this SKU because consumption exceeded your purchased amount. Users stay active only during the grace period.',
+  Suspended:
+    'Microsoft disabled the SKU for this tenant until billing or compliance issues are resolved, so users cannot access it.',
 };
 
 export function LicensingDashboard({ skus }: { skus: SkuUsageModel[] }) {
@@ -271,6 +282,19 @@ function SkuUsageCard({ sku }: { sku: SkuUsageModel }) {
   const styles = useStyles();
   const available = getAvailable(sku);
   const percentConsumed = getPercentConsumed(sku);
+  const statusInfo = capabilityStatusDescriptions[sku.capabilityStatus];
+  const badge = (
+    <Badge appearance={getStatusAppearance(sku.capabilityStatus)}>
+      {sku.capabilityStatus}
+    </Badge>
+  );
+  const statusNode = statusInfo ? (
+    <InfoLabel info={statusInfo} className={styles.statusInfoLabel}>
+      {badge}
+    </InfoLabel>
+  ) : (
+    badge
+  );
 
   return (
     <Card className={styles.card}>
@@ -287,9 +311,7 @@ function SkuUsageCard({ sku }: { sku: SkuUsageModel }) {
             </Text>
           }
         />
-        <Badge appearance={getStatusAppearance(sku.capabilityStatus)}>
-          {sku.capabilityStatus}
-        </Badge>
+        {statusNode}
       </div>
 
       <div className={styles.statBlock}>
