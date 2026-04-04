@@ -42,8 +42,12 @@ Built to reflect how identity-enabled applications are actually implemented, not
 [![Auth](<https://img.shields.io/badge/Auth-MS%20Entra%20ID%20(MSAL)-blueviolet>)](https://github.com/AzureAD/microsoft-authentication-library-for-js/tree/dev/lib/msal-react)
 [![Microsoft Graph](https://img.shields.io/badge/API-Microsoft%20Graph-blue)](https://github.com/microsoftgraph/msgraph-sdk-javascript)
 [![Fluent UI](https://img.shields.io/badge/UI-Fluent%20UI-ff69b4)](https://github.com/microsoft/fluentui)
-[![License](https://img.shields.io/github/license/dwarfered/nextjs-msal-react-graph-spa-template)](...)
-[![Last Commit](https://img.shields.io/github/last-commit/dwarfered/nextjs-msal-react-graph-spa-template)](...)
+[![License](https://img.shields.io/github/license/dwarfered/nextjs-msal-react-graph-spa-template)](https://github.com/dwarfered/nextjs-msal-react-graph-spa-template/blob/main/LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/dwarfered/nextjs-msal-react-graph-spa-template)](https://github.com/dwarfered/nextjs-msal-react-graph-spa-template/commits/main)
+
+<p align="center">
+  <img src="./public/docs/spa-pkce.png" alt="Authorization Flow with PKCE" width="800" />
+</p>
 
 ## ⭐ Support
 
@@ -143,7 +147,7 @@ npm install
 4. Redirect URI (type _Single-page application_): `http://localhost:3000`.
 5. After creating the app:
    - Copy the **Application (client) ID**.
-   - Under **Authentication**, add your production redirect URIs (e.g., `http://localhost:3000` `https://yourdomain.com`).
+   - Under **Authentication**, add your redirect URIs (e.g., `http://localhost:3000` `https://yourdomain.com`).
    - Under **API permissions**, add delegated Microsoft Graph scopes:
      | Permission | Reason |
      |------------|--------|
