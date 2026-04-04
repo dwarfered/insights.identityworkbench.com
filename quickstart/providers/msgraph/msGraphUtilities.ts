@@ -15,6 +15,13 @@ export class NoActiveAccountError extends Error {
   }
 }
 
+const popupFallbackErrorCodes = new Set([
+  'block_iframe_reload',
+  'token_renewal_timeout',
+  'monitor_window_timeout',
+  'timed_out',
+]);
+
 export async function getMsGraphAccessToken(): Promise<string> {
   // Ensure MSAL is fully initialized before using any API on the instance
   await ensureMsalInitialized();
@@ -42,17 +49,39 @@ export async function getMsGraphAccessToken(): Promise<string> {
       typeof error === 'object' && error && 'errorCode' in error
         ? String((error as { errorCode?: string }).errorCode ?? '')
         : '';
-    const shouldForceInteractive =
-      error instanceof InteractionRequiredAuthError ||
-      (error instanceof BrowserAuthError &&
-        ['block_iframe_reload', 'token_renewal_timeout', 'monitor_window_timeout'].includes(
-          errorCode,
-        )) ||
-      ['block_iframe_reload', 'timed_out', 'token_renewal_timeout'].includes(
-        errorCode,
-      );
 
-    if (shouldForceInteractive) {
+    const canUsePopup =
+      account &&
+      error instanceof BrowserAuthError &&
+      popupFallbackErrorCodes.has(errorCode);
+
+    if (canUsePopup) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn(
+          `MSAL: Silent token acquisition failed with ${errorCode}, trying popup`,
+          error,
+        );
+      }
+      try {
+        const popupResponse = await msalInstance.acquireTokenPopup({
+          ...loginRequest,
+          account,
+        });
+        if (popupResponse.account) {
+          msalInstance.setActiveAccount(popupResponse.account);
+        }
+        return popupResponse.accessToken;
+      } catch (popupError) {
+        if (popupError instanceof InteractionRequiredAuthError) {
+          msalInstance.loginRedirect(loginRequest);
+        } else if (process.env.NODE_ENV === 'development') {
+          console.error('MSAL: Popup token acquisition failed', popupError);
+        }
+        throw popupError;
+      }
+    }
+
+    if (error instanceof InteractionRequiredAuthError) {
       console.warn(
         'MSAL: Silent token acquisition failed, redirecting to sign in',
         error,
