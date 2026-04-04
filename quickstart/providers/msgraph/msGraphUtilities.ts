@@ -1,4 +1,7 @@
-import { InteractionRequiredAuthError } from '@azure/msal-browser';
+import {
+  BrowserAuthError,
+  InteractionRequiredAuthError,
+} from '@azure/msal-browser';
 import {
   ensureMsalInitialized,
   loginRequest,
@@ -35,13 +38,28 @@ export async function getMsGraphAccessToken(): Promise<string> {
     });
     return response.accessToken;
   } catch (error: unknown) {
-    if (error instanceof InteractionRequiredAuthError) {
-      console.warn('MSAL: Interaction required, redirecting to sign in');
+    const errorCode =
+      typeof error === 'object' && error && 'errorCode' in error
+        ? String((error as { errorCode?: string }).errorCode ?? '')
+        : '';
+    const shouldForceInteractive =
+      error instanceof InteractionRequiredAuthError ||
+      (error instanceof BrowserAuthError &&
+        ['block_iframe_reload', 'token_renewal_timeout', 'monitor_window_timeout'].includes(
+          errorCode,
+        )) ||
+      ['block_iframe_reload', 'timed_out', 'token_renewal_timeout'].includes(
+        errorCode,
+      );
+
+    if (shouldForceInteractive) {
+      console.warn(
+        'MSAL: Silent token acquisition failed, redirecting to sign in',
+        error,
+      );
       msalInstance.loginRedirect(loginRequest);
-    } else {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('MSAL: Silent token acquisition failed', error);
-      }
+    } else if (process.env.NODE_ENV === 'development') {
+      console.error('MSAL: Silent token acquisition failed', error);
     }
     throw error;
   }
