@@ -152,6 +152,7 @@ export default function Home() {
           height={1746}
           style={{
             width: '100%',
+            maxWidth: 960,
             height: 'auto',
             borderRadius: tokens.borderRadiusXLarge,
           }}
