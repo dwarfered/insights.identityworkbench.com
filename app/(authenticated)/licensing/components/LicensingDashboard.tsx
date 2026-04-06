@@ -6,7 +6,7 @@ import {
   Button,
   Card,
   CardHeader,
-  Dropdown,
+  Combobox,
   InfoLabel,
   Link,
   Option,
@@ -59,6 +59,15 @@ const useStyles = makeStyles({
     flexWrap: 'wrap',
     alignItems: 'center',
     gap: tokens.spacingHorizontalS,
+  },
+  pickerCombobox: {
+    minWidth: '320px',
+    maxWidth: '480px',
+    flex: '1 1 360px',
+  },
+  comboboxListbox: {
+    maxHeight: '320px',
+    overflowY: 'auto',
   },
   card: {
     borderRadius: tokens.borderRadiusXLarge,
@@ -186,6 +195,12 @@ function getEntraGroupUrl(groupId: string) {
   return `${ENTRA_GROUP_URL_BASE}${encodeURIComponent(groupId)}`;
 }
 
+function formatSkuLabel(sku: SkuUsageModel) {
+  return sku.displayName
+    ? `${sku.displayName} (${sku.skuPartNumber})`
+    : sku.skuPartNumber;
+}
+
 const skuMetricDescriptions = {
   warning:
     'Subscription expired but still in the Microsoft grace window. Units stay active until the customer renews or the state changes to suspended.',
@@ -205,6 +220,8 @@ const capabilityStatusDescriptions: Record<string, string> = {
 export function LicensingDashboard({ skus }: { skus: SkuUsageModel[] }) {
   const styles = useStyles();
   const [selectedSkuId, setSelectedSkuId] = React.useState<string | null>(null);
+  const [filterText, setFilterText] = React.useState('');
+  const [hasTypedFilter, setHasTypedFilter] = React.useState(false);
   const sortedSkus = React.useMemo(() => {
     return [...skus].sort((a, b) => {
       const labelA = (a.displayName ?? a.skuPartNumber).toLowerCase();
@@ -212,6 +229,18 @@ export function LicensingDashboard({ skus }: { skus: SkuUsageModel[] }) {
       return labelA.localeCompare(labelB);
     });
   }, [skus]);
+  const filteredSkus = React.useMemo(() => {
+    const query = filterText.trim().toLowerCase();
+    if (!query) {
+      return sortedSkus;
+    }
+    return sortedSkus.filter((sku) => {
+      const label = formatSkuLabel(sku).toLowerCase();
+      return (
+        label.includes(query) || sku.skuPartNumber.toLowerCase().includes(query)
+      );
+    });
+  }, [sortedSkus, filterText]);
 
   React.useEffect(() => {
     if (!sortedSkus.length) {
@@ -228,33 +257,60 @@ export function LicensingDashboard({ skus }: { skus: SkuUsageModel[] }) {
     });
   }, [sortedSkus]);
 
+  const displaySkus = hasTypedFilter ? filteredSkus : sortedSkus;
   const selectedSku = selectedSkuId
     ? sortedSkus.find((sku) => sku.skuId === selectedSkuId)
     : undefined;
+  React.useEffect(() => {
+    if (selectedSku) {
+      setFilterText(formatSkuLabel(selectedSku));
+      setHasTypedFilter(false);
+    }
+  }, [selectedSku]);
 
   return (
     <div className={styles.dashboard}>
       <div className={styles.pickerRow}>
         <Text weight='semibold'>Select a license SKU</Text>
-        <Dropdown
-          placeholder='Select a license SKU'
+        <Combobox
+          placeholder='Search licenses (e.g., F3)'
           disabled={!sortedSkus.length}
+          className={styles.pickerCombobox}
           selectedOptions={selectedSkuId ? [selectedSkuId] : []}
+          inputValue={filterText}
+          onInput={(event, data) => {
+            const nextValue =
+              data?.value ??
+              (event?.currentTarget instanceof HTMLInputElement
+                ? event.currentTarget.value
+                : '');
+            setFilterText(nextValue);
+            setHasTypedFilter(nextValue.trim().length > 0);
+          }}
+          onOpenChange={(_, data) => {
+            if (data.open) {
+              setHasTypedFilter(false);
+            }
+          }}
+          listbox={{ className: styles.comboboxListbox }}
           onOptionSelect={(_, data) => {
             const optionValue = data.optionValue;
             if (typeof optionValue === 'string') {
               setSelectedSkuId(optionValue);
+              const match = sortedSkus.find((sku) => sku.skuId === optionValue);
+              if (match) {
+                setFilterText(formatSkuLabel(match));
+              }
+              setHasTypedFilter(false);
             }
           }}
         >
-          {sortedSkus.map((sku) => (
+          {displaySkus.map((sku) => (
             <Option key={sku.skuId} value={sku.skuId}>
-              {sku.displayName
-                ? `${sku.displayName} (${sku.skuPartNumber})`
-                : sku.skuPartNumber}
+              {formatSkuLabel(sku)}
             </Option>
           ))}
-        </Dropdown>
+        </Combobox>
       </div>
 
       {selectedSku ? (
