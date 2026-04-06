@@ -138,6 +138,9 @@ const useStyles = makeStyles({
     width: '100%',
     minWidth: 0,
   },
+  breakdownContent: {
+    marginTop: tokens.spacingVerticalL,
+  },
   breakdownChartWrapper: {
     width: '100%',
     minWidth: 0,
@@ -472,120 +475,122 @@ function SkuEmployeeTypeBreakdownCard({ skuId }: { skuId: string }) {
         header={<Text weight='semibold'>Employee type breakdown</Text>}
         description='User counts by employee type for this license.'
       />
-      {requestId === 0 ? (
-        <Button
-          appearance='primary'
-          onClick={() => setRequestId((id) => id + 1)}
-        >
-          Request breakdown
-        </Button>
-      ) : isLoading ? (
-        <div className={styles.breakdownList}>
-          <Spinner label='Calculating employee type breakdown… May take time for large tenants.' />
-          <Text size={200} className={styles.groupMeta}>
-            Processed {progress.processed.toLocaleString()} user
-            {progress.processed === 1 ? '' : 's'}
-            {progress.total !== null
-              ? ` of ${progress.total.toLocaleString()} assigned`
-              : ''}
-          </Text>
-          <Button appearance='secondary' onClick={() => cancel()}>
-            Cancel request
-          </Button>
-        </div>
-      ) : error ? (
-        <>
-          <Text>
-            {error instanceof Error
-              ? error.message
-              : 'Unable to load breakdown'}
-          </Text>
-          <Button onClick={() => setRequestId((id) => id + 1)}>
-            Try again
-          </Button>
-        </>
-      ) : isCancelled ? (
-        <>
-          <Text size={200} className={styles.groupMeta}>
-            Cancelled after processing {progress.processed.toLocaleString()}{' '}
-            user
-            {progress.processed === 1 ? '' : 's'}.
-          </Text>
+      <div className={styles.breakdownContent}>
+        {requestId === 0 ? (
           <Button
-            appearance='secondary'
+            appearance='primary'
             onClick={() => setRequestId((id) => id + 1)}
           >
-            Restart breakdown
+            Request breakdown
           </Button>
-        </>
-      ) : breakdown ? (
-        <div className={styles.breakdownList}>
-          {chartData.length ? (
-            <div className={styles.breakdownChartWrapper}>
-              <ResponsiveContainer width='100%' height={320}>
-                <BarChart
-                  data={chartData}
-                  margin={{ top: 12, right: 16, left: 4, bottom: 32 }}
-                >
-                  <CartesianGrid
-                    strokeDasharray='3 3'
-                    stroke={tokens.colorNeutralStroke2}
-                  />
-                  <XAxis
-                    dataKey='label'
-                    interval={0}
-                    angle={-20}
-                    textAnchor='end'
-                    height={60}
-                    tick={{ fill: tokens.colorNeutralForeground2 }}
-                  />
-                  <YAxis
-                    allowDecimals={false}
-                    tick={{ fill: tokens.colorNeutralForeground2 }}
-                  />
-                  <Tooltip
-                    cursor={{ fill: 'transparent' }}
-                    labelStyle={{ color: tokens.colorNeutralForeground1 }}
-                    contentStyle={{
-                      borderRadius: tokens.borderRadiusMedium,
-                      border: `1px solid ${tokens.colorNeutralStroke2}`,
-                    }}
-                  />
-                  <Bar
-                    dataKey='count'
-                    fill={tokens.colorPaletteBlueBackground2}
-                    radius={[6, 6, 0, 0]}
+        ) : isLoading ? (
+          <div className={styles.breakdownList}>
+            <Spinner label='Calculating employee type breakdown… May take time for large tenants.' />
+            <Text size={200} className={styles.groupMeta}>
+              Processed {progress.processed.toLocaleString()} user
+              {progress.processed === 1 ? '' : 's'}
+              {progress.total !== null
+                ? ` of ${progress.total.toLocaleString()} assigned`
+                : ''}
+            </Text>
+            <Button appearance='secondary' onClick={() => cancel()}>
+              Cancel request
+            </Button>
+          </div>
+        ) : error ? (
+          <>
+            <Text>
+              {error instanceof Error
+                ? error.message
+                : 'Unable to load breakdown'}
+            </Text>
+            <Button onClick={() => setRequestId((id) => id + 1)}>
+              Try again
+            </Button>
+          </>
+        ) : isCancelled ? (
+          <>
+            <Text size={200} className={styles.groupMeta}>
+              Cancelled after processing {progress.processed.toLocaleString()}{' '}
+              user
+              {progress.processed === 1 ? '' : 's'}.
+            </Text>
+            <Button
+              appearance='secondary'
+              onClick={() => setRequestId((id) => id + 1)}
+            >
+              Restart breakdown
+            </Button>
+          </>
+        ) : breakdown ? (
+          <div className={styles.breakdownList}>
+            {chartData.length ? (
+              <div className={styles.breakdownChartWrapper}>
+                <ResponsiveContainer width='100%' height={320}>
+                  <BarChart
+                    data={chartData}
+                    margin={{ top: 12, right: 16, left: 4, bottom: 32 }}
                   >
-                    <LabelList
-                      dataKey='count'
-                      position='top'
-                      style={{
-                        fill: tokens.colorNeutralForeground1,
-                        fontWeight: 600,
+                    <CartesianGrid
+                      strokeDasharray='3 3'
+                      stroke={tokens.colorNeutralStroke2}
+                    />
+                    <XAxis
+                      dataKey='label'
+                      interval={0}
+                      angle={-20}
+                      textAnchor='end'
+                      height={60}
+                      tick={{ fill: tokens.colorNeutralForeground2 }}
+                    />
+                    <YAxis
+                      allowDecimals={false}
+                      tick={{ fill: tokens.colorNeutralForeground2 }}
+                    />
+                    <Tooltip
+                      cursor={{ fill: 'transparent' }}
+                      labelStyle={{ color: tokens.colorNeutralForeground1 }}
+                      contentStyle={{
+                        borderRadius: tokens.borderRadiusMedium,
+                        border: `1px solid ${tokens.colorNeutralStroke2}`,
                       }}
                     />
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          ) : null}
-          {/* <Text size={200} className={styles.groupMeta}>
+                    <Bar
+                      dataKey='count'
+                      fill={tokens.colorPaletteBlueBackground2}
+                      radius={[6, 6, 0, 0]}
+                    >
+                      <LabelList
+                        dataKey='count'
+                        position='top'
+                        style={{
+                          fill: tokens.colorNeutralForeground1,
+                          fontWeight: 600,
+                        }}
+                      />
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            ) : null}
+            {/* <Text size={200} className={styles.groupMeta}>
             Total licensed users: {breakdown.totalAssigned}
           </Text> */}
-          {breakdown.buckets.map((bucket) => (
-            <div key={bucket.label} className={styles.groupRow}>
-              <Text weight='semibold'>{bucket.label}</Text>
-              <Text weight='semibold'>{bucket.count}</Text>
-            </div>
-          ))}
-          <Button
-            appearance='secondary'
-            onClick={() => setRequestId((id) => id + 1)}
-          >
-            Refresh breakdown
-          </Button>
-        </div>
-      ) : null}
+            {breakdown.buckets.map((bucket) => (
+              <div key={bucket.label} className={styles.groupRow}>
+                <Text weight='semibold'>{bucket.label}</Text>
+                <Text weight='semibold'>{bucket.count}</Text>
+              </div>
+            ))}
+            <Button
+              appearance='secondary'
+              onClick={() => setRequestId((id) => id + 1)}
+            >
+              Refresh breakdown
+            </Button>
+          </div>
+        ) : null}
+      </div>
     </Card>
   );
 }
