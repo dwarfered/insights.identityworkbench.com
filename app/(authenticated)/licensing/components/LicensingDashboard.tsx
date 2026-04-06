@@ -277,8 +277,8 @@ export function LicensingDashboard({ skus }: { skus: SkuUsageModel[] }) {
           disabled={!sortedSkus.length}
           className={styles.pickerCombobox}
           selectedOptions={selectedSkuId ? [selectedSkuId] : []}
-          inputValue={filterText}
-          onInput={(event, data) => {
+          value={filterText}
+          onInput={(event, data?: { value?: string }) => {
             const nextValue =
               data?.value ??
               (event?.currentTarget instanceof HTMLInputElement
@@ -287,8 +287,8 @@ export function LicensingDashboard({ skus }: { skus: SkuUsageModel[] }) {
             setFilterText(nextValue);
             setHasTypedFilter(nextValue.trim().length > 0);
           }}
-          onOpenChange={(_, data) => {
-            if (data.open) {
+          onOpenChange={(_, data?: { open: boolean }) => {
+            if (data?.open) {
               setHasTypedFilter(false);
             }
           }}
