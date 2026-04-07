@@ -60,18 +60,6 @@ const useStyles = makeStyles({
     alignItems: 'center',
     gap: tokens.spacingHorizontalS,
   },
-  pickerCombobox: {
-    minWidth: '320px',
-    maxWidth: '480px',
-    flex: '1 1 360px',
-  },
-  comboboxListbox: {
-    maxHeight: '320px',
-    overflowY: 'auto',
-  },
-  comboboxPopup: {
-    maxHeight: '320px',
-  },
   card: {
     borderRadius: tokens.borderRadiusXLarge,
     padding: tokens.spacingHorizontalL,
@@ -281,7 +269,6 @@ export function LicensingDashboard({ skus }: { skus: SkuUsageModel[] }) {
         <Combobox
           placeholder='Search licenses (e.g., F3)'
           disabled={!sortedSkus.length}
-          className={styles.pickerCombobox}
           selectedOptions={selectedSkuId ? [selectedSkuId] : []}
           value={filterText}
           onInput={(event, data?: { value?: string }) => {
@@ -297,15 +284,6 @@ export function LicensingDashboard({ skus }: { skus: SkuUsageModel[] }) {
             if (data?.open) {
               setHasTypedFilter(false);
             }
-          }}
-          listbox={{
-            className: styles.comboboxListbox,
-            style: { maxHeight: '320px', overflowY: 'auto' },
-          }}
-          popup={{
-            className: styles.comboboxPopup,
-            inline: true,
-            style: { maxHeight: '320px', overflowY: 'auto' },
           }}
           onOptionSelect={(_, data) => {
             const optionValue = data.optionValue;
