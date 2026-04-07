@@ -8,6 +8,27 @@ import {
   msalInstance,
 } from '../msal/msalAuthConfig';
 
+const globalForMsGraph = globalThis as typeof globalThis & {
+  __msalInteractiveTokenPending?: boolean;
+};
+
+function isInteractiveTokenPending() {
+  return typeof window !== 'undefined'
+    ? Boolean(globalForMsGraph.__msalInteractiveTokenPending)
+    : false;
+}
+
+function setInteractiveTokenPending(value: boolean) {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  globalForMsGraph.__msalInteractiveTokenPending = value;
+}
+
+export function clearInteractiveTokenRequestFlag() {
+  setInteractiveTokenPending(false);
+}
+
 export class NoActiveAccountError extends Error {
   constructor() {
     super('No active account found.');
@@ -51,11 +72,25 @@ export async function getMsGraphAccessToken(): Promise<string> {
         ));
 
     if (requiresInteractive) {
+      if (isInteractiveTokenPending()) {
+        return new Promise<never>(() => {}) as Promise<string>;
+      }
+      setInteractiveTokenPending(true);
       console.warn(
-        'MSAL: Silent token acquisition failed, redirecting to sign in',
+        'MSAL: Silent token acquisition failed, requesting interactive token via redirect',
         error,
       );
-      msalInstance.loginRedirect(loginRequest);
+      msalInstance
+        .acquireTokenRedirect(
+          account
+            ? { ...loginRequest, account }
+            : { ...loginRequest },
+        )
+        .catch((redirectError) => {
+          setInteractiveTokenPending(false);
+          throw redirectError;
+        });
+      return new Promise<never>(() => {}) as Promise<string>;
     } else if (process.env.NODE_ENV === 'development') {
       console.error('MSAL: Silent token acquisition failed', error);
     }

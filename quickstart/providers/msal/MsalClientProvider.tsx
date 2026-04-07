@@ -7,11 +7,17 @@ import {
   loginRequest,
   msalInstance,
 } from './msalAuthConfig';
+import { clearInteractiveTokenRequestFlag } from '../msgraph/msGraphUtilities';
 
 async function initializeMsalClient() {
   await ensureMsalInitialized();
 
-  const result = await msalInstance.handleRedirectPromise();
+  let result = null;
+  try {
+    result = await msalInstance.handleRedirectPromise();
+  } finally {
+    clearInteractiveTokenRequestFlag();
+  }
 
   if (result?.account) {
     msalInstance.setActiveAccount(result.account);
