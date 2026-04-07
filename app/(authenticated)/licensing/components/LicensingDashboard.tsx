@@ -69,6 +69,9 @@ const useStyles = makeStyles({
     maxHeight: '320px',
     overflowY: 'auto',
   },
+  comboboxPopup: {
+    maxHeight: '320px',
+  },
   card: {
     borderRadius: tokens.borderRadiusXLarge,
     padding: tokens.spacingHorizontalL,
@@ -297,7 +300,11 @@ export function LicensingDashboard({ skus }: { skus: SkuUsageModel[] }) {
           }}
           listbox={{
             className: styles.comboboxListbox,
-            style: { maxHeight: 320, overflowY: 'auto' },
+            style: { maxHeight: '320px', overflowY: 'auto' },
+          }}
+          popup={{
+            className: styles.comboboxPopup,
+            style: { maxHeight: '320px', overflow: 'auto' },
           }}
           onOptionSelect={(_, data) => {
             const optionValue = data.optionValue;
