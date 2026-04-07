@@ -295,7 +295,10 @@ export function LicensingDashboard({ skus }: { skus: SkuUsageModel[] }) {
               setHasTypedFilter(false);
             }
           }}
-          listbox={{ className: styles.comboboxListbox }}
+          listbox={{
+            className: styles.comboboxListbox,
+            style: { maxHeight: 320, overflowY: 'auto' },
+          }}
           onOptionSelect={(_, data) => {
             const optionValue = data.optionValue;
             if (typeof optionValue === 'string') {
