@@ -304,7 +304,8 @@ export function LicensingDashboard({ skus }: { skus: SkuUsageModel[] }) {
           }}
           popup={{
             className: styles.comboboxPopup,
-            style: { maxHeight: '320px', overflow: 'auto' },
+            inline: true,
+            style: { maxHeight: '320px', overflowY: 'auto' },
           }}
           onOptionSelect={(_, data) => {
             const optionValue = data.optionValue;
