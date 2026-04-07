@@ -124,7 +124,7 @@ const useStyles = makeStyles({
   groupRow: {
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     padding: `${tokens.spacingVerticalS} ${tokens.spacingHorizontalS}`,
     borderRadius: tokens.borderRadiusMedium,
     backgroundColor: tokens.colorNeutralBackground3,
@@ -133,6 +133,9 @@ const useStyles = makeStyles({
     display: 'flex',
     flexDirection: 'column',
     gap: tokens.spacingVerticalXXS,
+  },
+  groupCount: {
+    color: tokens.colorNeutralForeground2,
   },
   groupMeta: {
     color: tokens.colorNeutralForeground3,
@@ -494,12 +497,12 @@ function SkuLicenseGroupsCard({ skuId }: { skuId: string }) {
                   {group.description}
                 </Text>
               ) : null}
+              <Text size={200} className={styles.groupCount}>
+                {group.memberCount !== null
+                  ? `${group.memberCount.toLocaleString()} member${group.memberCount === 1 ? '' : 's'}`
+                  : 'Member count unavailable'}
+              </Text>
             </div>
-            <Text weight='semibold'>
-              {group.memberCount !== null
-                ? `${group.memberCount} members`
-                : 'Unknown count'}
-            </Text>
           </div>
         ))}
       </div>
