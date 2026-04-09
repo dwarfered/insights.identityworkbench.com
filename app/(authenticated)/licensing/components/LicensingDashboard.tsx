@@ -275,9 +275,15 @@ function getStatusAppearance(
 
 const ENTRA_GROUP_URL_BASE =
   'https://entra.microsoft.com/#view/Microsoft_AAD_IAM/GroupDetailsMenuBlade/~/Overview/groupId/';
+const ENTRA_USER_URL_BASE =
+  'https://entra.microsoft.com/#view/Microsoft_AAD_UsersAndTenants/UserProfileMenuBlade/~/overview/userId/';
 
 function getEntraGroupUrl(groupId: string) {
   return `${ENTRA_GROUP_URL_BASE}${encodeURIComponent(groupId)}`;
+}
+
+function getEntraUserUrl(userId: string) {
+  return `${ENTRA_USER_URL_BASE}${encodeURIComponent(userId)}`;
 }
 
 function formatSkuLabel(sku: SkuUsageModel) {
@@ -785,11 +791,16 @@ function GroupLicenseErrorInsights({
                       <div className={styles.errorDetailsPanel}>
                         {selectedUser ? (
                           <>
-                            <Text weight='semibold'>
+                            <Link
+                              href={getEntraUserUrl(selectedUser.id)}
+                              target='_blank'
+                              rel='noreferrer'
+                              className={styles.groupLink}
+                            >
                               {selectedUser.displayName ??
                                 selectedUser.userPrincipalName ??
                                 'Selected user'}
-                            </Text>
+                            </Link>
                             <UserLicenseAssignmentStatePanel
                               userId={selectedUser.id}
                               skuId={skuId}
