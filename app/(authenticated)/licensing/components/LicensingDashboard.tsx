@@ -138,7 +138,7 @@ const useStyles = makeStyles({
     columnGap: tokens.spacingHorizontalS,
     rowGap: tokens.spacingVerticalXXS,
     flexWrap: 'wrap',
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-start',
   },
   errorBadge: {
     whiteSpace: 'nowrap',
