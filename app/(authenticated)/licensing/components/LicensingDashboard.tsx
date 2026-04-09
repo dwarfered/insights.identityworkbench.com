@@ -310,21 +310,27 @@ const capabilityStatusDescriptions: Record<string, string> = {
 
 const licenseAssignmentErrorDescriptions: Record<string, string> = {
   CountViolation:
-    'The tenant has assigned more units than it purchased. Remove a seat or increase the license count.',
+    'The tenant has assigned more units than it purchased. Remove a seat, increase the license count, or reprocess the user assignment. In some cases, the assignment may remain in error until it is manually reprocessed even if capacity becomes available.',
+
   DependencyViolation:
-    'This SKU depends on another license or service plan that the user does not have.',
+    'This license requires another license or service plan that the user does not have.',
+
   CoexistenceViolation:
-    'The SKU conflicts with another assigned SKU or service plan. Remove the overlap to proceed.',
+    'This license conflicts with another assigned license. Remove the conflicting license to continue.',
+
   ProhibitedInRegion:
-    'The users usage location does not allow this SKU. Update the usage location or skip the assignment.',
+    'This license is not available in the users location. Update the usage location or remove the assignment.',
+
   ConsumerSubscription:
-    'The SKU is intended for personal accounts and cannot be assigned in this tenant.',
+    'This license is for personal use and cannot be assigned in this tenant.',
+
   ServicePlanConflict:
-    'A service plan inside the SKU conflicts with another license granted to the user.',
-  PendingInput:
-    'Microsoft Graph is still processing this change. Check again shortly.',
+    'A service within this license conflicts with another assigned license.',
+
+  PendingInput: 'License assignment is still processing. Check again shortly.',
+
   UniquenessViolation:
-    'A required attribute (often the user principal name or email) conflicts with an existing account.',
+    'A required attribute (such as UPN or email) conflicts with another account.',
 };
 
 export function LicensingDashboard({ skus }: { skus: SkuUsageModel[] }) {
