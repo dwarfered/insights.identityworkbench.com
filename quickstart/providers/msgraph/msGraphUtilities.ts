@@ -80,16 +80,14 @@ export async function getMsGraphAccessToken(): Promise<string> {
         'MSAL: Silent token acquisition failed, requesting interactive token via redirect',
         error,
       );
-      msalInstance
-        .acquireTokenRedirect(
-          account
-            ? { ...loginRequest, account }
-            : { ...loginRequest },
-        )
-        .catch((redirectError) => {
-          setInteractiveTokenPending(false);
-          throw redirectError;
-        });
+      try {
+        await msalInstance.acquireTokenRedirect(
+          account ? { ...loginRequest, account } : { ...loginRequest },
+        );
+      } catch (redirectError) {
+        setInteractiveTokenPending(false);
+        throw redirectError;
+      }
       return new Promise<never>(() => {}) as Promise<string>;
     } else if (process.env.NODE_ENV === 'development') {
       console.error('MSAL: Silent token acquisition failed', error);
