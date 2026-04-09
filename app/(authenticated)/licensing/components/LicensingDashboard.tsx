@@ -7,6 +7,12 @@ import {
   Card,
   CardHeader,
   Combobox,
+  Dialog,
+  DialogActions,
+  DialogBody,
+  DialogContent,
+  DialogSurface,
+  DialogTitle,
   InfoLabel,
   Link,
   Option,
@@ -14,6 +20,7 @@ import {
   Spinner,
   Text,
   makeStyles,
+  mergeClasses,
   tokens,
 } from '@fluentui/react-components';
 import {
@@ -26,8 +33,13 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { useSkuLicenseGroupsQuery } from './useSkuLicenseGroupsQuery';
+import {
+  useSkuLicenseGroupsQuery,
+  type GroupWithMemberCount,
+} from './useSkuLicenseGroupsQuery';
 import { useSkuEmployeeTypeBreakdown } from './useSkuEmployeeTypeBreakdown';
+import { useGroupLicenseErrorMembersQuery } from './useGroupLicenseErrorMembersQuery';
+import { useUserLicenseAssignmentStatesQuery } from './useUserLicenseAssignmentStatesQuery';
 
 export type SkuUsageModel = {
   skuId: string;
@@ -120,6 +132,17 @@ const useStyles = makeStyles({
     borderRadius: tokens.borderRadiusMedium,
     backgroundColor: tokens.colorNeutralBackground3,
   },
+  groupRowActions: {
+    display: 'flex',
+    alignItems: 'center',
+    columnGap: tokens.spacingHorizontalS,
+    rowGap: tokens.spacingVerticalXXS,
+    flexWrap: 'wrap',
+    justifyContent: 'flex-end',
+  },
+  errorBadge: {
+    whiteSpace: 'nowrap',
+  },
   groupNameBlock: {
     display: 'flex',
     flexDirection: 'column',
@@ -155,6 +178,74 @@ const useStyles = makeStyles({
     '@media (min-width: 1024px)': {
       gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
     },
+  },
+  errorDialogContent: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: tokens.spacingVerticalM,
+  },
+  errorDialogSplit: {
+    display: 'grid',
+    gap: tokens.spacingHorizontalL,
+    gridTemplateColumns: 'minmax(0, 1fr)',
+    '@media (min-width: 768px)': {
+      gridTemplateColumns: 'minmax(0, 240px) minmax(0, 1fr)',
+    },
+  },
+  errorList: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: tokens.spacingVerticalXXS,
+    maxHeight: '360px',
+    overflowY: 'auto',
+    paddingRight: tokens.spacingHorizontalS,
+  },
+  errorUserButton: {
+    textAlign: 'left',
+    width: '100%',
+    borderRadius: tokens.borderRadiusMedium,
+    border: `1px solid ${tokens.colorNeutralStroke2}`,
+    backgroundColor: tokens.colorNeutralBackground1,
+    padding: tokens.spacingHorizontalS,
+    cursor: 'pointer',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: tokens.spacingVerticalXXS,
+    transitionProperty: 'background, border, box-shadow',
+    transitionDuration: tokens.durationUltraFast,
+    ':hover': {
+      backgroundColor: tokens.colorNeutralBackground1Hover,
+      border: `1px solid ${tokens.colorNeutralStrokeAccessible}`,
+    },
+  },
+  errorUserButtonActive: {
+    border: `1px solid ${tokens.colorPaletteRedBorder2}`,
+    boxShadow: `0 0 0 1px ${tokens.colorPaletteRedBorder2}`,
+    backgroundColor: tokens.colorPaletteRedBackground1,
+  },
+  errorUserMeta: {
+    color: tokens.colorNeutralForeground3,
+  },
+  errorDetailsPanel: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: tokens.spacingVerticalM,
+  },
+  assignmentStateList: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: tokens.spacingVerticalS,
+  },
+  assignmentStateRow: {
+    border: `1px solid ${tokens.colorNeutralStroke2}`,
+    borderRadius: tokens.borderRadiusMedium,
+    padding: tokens.spacingHorizontalS,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: tokens.spacingVerticalXXS,
+  },
+  errorEmptyState: {
+    color: tokens.colorNeutralForeground3,
   },
 });
 
@@ -427,6 +518,7 @@ function SkuUsageCard({ sku }: { sku: SkuUsageModel }) {
 function SkuLicenseGroupsCard({ skuId }: { skuId: string }) {
   const styles = useStyles();
   const { groups, isLoading, error } = useSkuLicenseGroupsQuery(skuId);
+  const totalGroups = groups.length;
 
   if (isLoading) {
     return (
@@ -467,35 +559,254 @@ function SkuLicenseGroupsCard({ skuId }: { skuId: string }) {
     <Card>
       <CardHeader
         header={<Text weight='semibold'>Groups assigning this license</Text>}
-        description={`${groups.length} group${groups.length === 1 ? '' : 's'} applies this license`}
+        description={`${totalGroups} group${totalGroups === 1 ? '' : 's'} applies this license`}
       />
       <div className={styles.groupList}>
         {groups.map((group) => (
-          <div key={group.id} className={styles.groupRow}>
-            <div className={styles.groupNameBlock}>
-              <Link
-                href={getEntraGroupUrl(group.id)}
-                target='_blank'
-                rel='noreferrer'
-                className={styles.groupLink}
-              >
-                {group.displayName ?? 'Unnamed group'}
-              </Link>
-              {group.description ? (
-                <Text size={200} className={styles.groupMeta}>
-                  {group.description}
-                </Text>
-              ) : null}
-              <Text size={200} className={styles.groupCount}>
-                {group.memberCount !== null
-                  ? `${group.memberCount.toLocaleString()} member${group.memberCount === 1 ? '' : 's'}`
-                  : 'Member count unavailable'}
-              </Text>
-            </div>
-          </div>
+          <LicenseGroupRow key={group.id} group={group} skuId={skuId} />
         ))}
       </div>
     </Card>
+  );
+}
+
+function LicenseGroupRow({
+  group,
+  skuId,
+}: {
+  group: GroupWithMemberCount;
+  skuId: string;
+}) {
+  const styles = useStyles();
+  return (
+    <div className={styles.groupRow}>
+      <div className={styles.groupNameBlock}>
+        <Link
+          href={getEntraGroupUrl(group.id)}
+          target='_blank'
+          rel='noreferrer'
+          className={styles.groupLink}
+        >
+          {group.displayName ?? 'Unnamed group'}
+        </Link>
+        {group.description ? (
+          <Text size={200} className={styles.groupMeta}>
+            {group.description}
+          </Text>
+        ) : null}
+        <Text size={200} className={styles.groupCount}>
+          {group.memberCount !== null
+            ? `${group.memberCount.toLocaleString()} member${group.memberCount === 1 ? '' : 's'}`
+            : 'Member count unavailable'}
+        </Text>
+      </div>
+      <div className={styles.groupRowActions}>
+        <GroupLicenseErrorInsights
+          groupId={group.id}
+          groupName={group.displayName}
+          skuId={skuId}
+        />
+      </div>
+    </div>
+  );
+}
+
+function GroupLicenseErrorInsights({
+  groupId,
+  groupName,
+  skuId,
+}: {
+  groupId: string;
+  groupName?: string;
+  skuId: string;
+}) {
+  const styles = useStyles();
+  const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [selectedUserId, setSelectedUserId] = React.useState<string | null>(
+    null,
+  );
+  const { members, total, error, isLoading } =
+    useGroupLicenseErrorMembersQuery(groupId);
+  const sortedMembers = React.useMemo(() => {
+    return [...members].sort((a, b) => {
+      const nameA = (a.displayName ?? a.userPrincipalName ?? '').toLowerCase();
+      const nameB = (b.displayName ?? b.userPrincipalName ?? '').toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
+  }, [members]);
+
+  const issueCount = total ?? sortedMembers.length;
+  const hasIssues = issueCount > 0;
+
+  React.useEffect(() => {
+    if (!dialogOpen) {
+      setSelectedUserId(null);
+      return;
+    }
+    if (!sortedMembers.length) {
+      setSelectedUserId(null);
+      return;
+    }
+    setSelectedUserId((current) => {
+      if (current && sortedMembers.some((member) => member.id === current)) {
+        return current;
+      }
+      return sortedMembers[0]?.id ?? null;
+    });
+  }, [dialogOpen, sortedMembers]);
+
+  const closeDialog = () => {
+    setDialogOpen(false);
+    setSelectedUserId(null);
+  };
+
+  const selectedUser = sortedMembers.find((m) => m.id === selectedUserId);
+
+  return (
+    <>
+      {isLoading ? (
+        <Spinner aria-label='Checking for license errors' />
+      ) : (
+        <Badge
+          appearance={hasIssues ? 'filled' : 'outline'}
+          color={hasIssues ? 'danger' : 'brand'}
+          className={styles.errorBadge}
+        >
+          {hasIssues
+            ? `${issueCount.toLocaleString()} issue${issueCount === 1 ? '' : 's'}`
+            : 'No license errors'}
+        </Badge>
+      )}
+      {hasIssues ? (
+        <Button
+          appearance='secondary'
+          size='small'
+          onClick={() => setDialogOpen(true)}
+        >
+          View affected users
+        </Button>
+      ) : null}
+      <Dialog
+        open={dialogOpen}
+        onOpenChange={(_, data) => {
+          if (!data.open) {
+            closeDialog();
+          }
+        }}
+      >
+        <DialogSurface>
+          <DialogBody>
+            <DialogTitle>
+              License issues in {groupName ?? 'this group'}
+            </DialogTitle>
+            <DialogContent>
+              <div className={styles.errorDialogContent}>
+                {isLoading ? (
+                  <Spinner label='Loading issue details…' />
+                ) : error ? (
+                  <Text role='alert'>
+                    {error instanceof Error ? error.message : String(error)}
+                  </Text>
+                ) : !sortedMembers.length ? (
+                  <Text className={styles.errorEmptyState}>
+                    Microsoft Graph did not return any users with assignment
+                    errors for this group.
+                  </Text>
+                ) : (
+                  <>
+                    <Text weight='semibold'>
+                      {issueCount.toLocaleString()} user
+                      {issueCount === 1 ? '' : 's'} with assignment issues
+                    </Text>
+                    <div className={styles.errorDialogSplit}>
+                      <div className={styles.errorList}>
+                        {sortedMembers.map((member) => (
+                          <button
+                            key={member.id}
+                            type='button'
+                            className={mergeClasses(
+                              styles.errorUserButton,
+                              member.id === selectedUserId
+                                ? styles.errorUserButtonActive
+                                : undefined,
+                            )}
+                            onClick={() => setSelectedUserId(member.id)}
+                          >
+                            <Text weight='semibold'>
+                              {member.displayName ??
+                                member.userPrincipalName ??
+                                'Unknown user'}
+                            </Text>
+                            {member.userPrincipalName ? (
+                              <Text
+                                size={200}
+                                className={styles.errorUserMeta}
+                              >
+                                {member.userPrincipalName}
+                              </Text>
+                            ) : null}
+                            {member.mail ? (
+                              <Text
+                                size={200}
+                                className={styles.errorUserMeta}
+                              >
+                                {member.mail}
+                              </Text>
+                            ) : null}
+                          </button>
+                        ))}
+                      </div>
+                      <div className={styles.errorDetailsPanel}>
+                        {selectedUser ? (
+                          <>
+                            <div>
+                              <Text weight='semibold'>
+                                {selectedUser.displayName ??
+                                  selectedUser.userPrincipalName ??
+                                  'Selected user'}
+                              </Text>
+                              {selectedUser.userPrincipalName ? (
+                                <Text
+                                  size={200}
+                                  className={styles.errorUserMeta}
+                                >
+                                  {selectedUser.userPrincipalName}
+                                </Text>
+                              ) : null}
+                              {selectedUser.mail ? (
+                                <Text
+                                  size={200}
+                                  className={styles.errorUserMeta}
+                                >
+                                  {selectedUser.mail}
+                                </Text>
+                              ) : null}
+                            </div>
+                            <UserLicenseAssignmentStatePanel
+                              userId={selectedUser.id}
+                              skuId={skuId}
+                            />
+                          </>
+                        ) : (
+                          <Text className={styles.errorEmptyState}>
+                            Select a user to view their assignment details.
+                          </Text>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </DialogContent>
+            <DialogActions>
+              <Button appearance='secondary' onClick={closeDialog}>
+                Close
+              </Button>
+            </DialogActions>
+          </DialogBody>
+        </DialogSurface>
+      </Dialog>
+    </>
   );
 }
 
@@ -641,4 +952,83 @@ function SkuEmployeeTypeBreakdownCard({ skuId }: { skuId: string }) {
       </div>
     </Card>
   );
+}
+
+function UserLicenseAssignmentStatePanel({
+  userId,
+  skuId,
+}: {
+  userId: string;
+  skuId: string;
+}) {
+  const styles = useStyles();
+  const { assignmentStates, error, isLoading } =
+    useUserLicenseAssignmentStatesQuery(userId);
+  const normalizedSkuId = skuId.toLowerCase();
+  const filteredStates = React.useMemo(
+    () =>
+      assignmentStates.filter(
+        (state) =>
+          typeof state.skuId === 'string' &&
+          state.skuId.toLowerCase() === normalizedSkuId,
+      ),
+    [assignmentStates, normalizedSkuId],
+  );
+
+  if (isLoading) {
+    return <Spinner label='Loading assignment states…' />;
+  }
+
+  if (error) {
+    return (
+      <Text role='alert'>
+        {error instanceof Error ? error.message : String(error)}
+      </Text>
+    );
+  }
+
+  if (!filteredStates.length) {
+    return (
+      <Text className={styles.errorEmptyState}>
+        Microsoft Graph did not return licenseAssignmentStates for this SKU.
+      </Text>
+    );
+  }
+
+  return (
+    <div className={styles.assignmentStateList}>
+      {filteredStates.map((state, index) => (
+        <div
+          key={`${state.skuId}-${state.assignedByGroup ?? 'direct'}-${index}`}
+          className={styles.assignmentStateRow}
+        >
+          <Text weight='semibold'>
+            State: {state.state ?? 'Unknown state'}
+          </Text>
+          {state.error ? (
+            <Text size={200} className={styles.groupMeta}>
+              Error: {state.error}
+            </Text>
+          ) : null}
+          <Text size={200} className={styles.groupMeta}>
+            Assigned by:{' '}
+            {state.assignedByGroup ?? 'Direct or unknown assignment'}
+          </Text>
+          {state.lastUpdatedDateTime ? (
+            <Text size={200} className={styles.groupMeta}>
+              Updated {formatDate(state.lastUpdatedDateTime)}
+            </Text>
+          ) : null}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function formatDate(value: string) {
+  const parsed = Date.parse(value);
+  if (Number.isNaN(parsed)) {
+    return value;
+  }
+  return new Date(parsed).toLocaleString();
 }
