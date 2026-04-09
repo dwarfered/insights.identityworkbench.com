@@ -302,6 +302,23 @@ const capabilityStatusDescriptions: Record<string, string> = {
     'Microsoft disabled the SKU for this tenant until billing or compliance issues are resolved, so users cannot access it.',
 };
 
+const licenseAssignmentErrorDescriptions: Record<string, string> = {
+  CountViolation:
+    'The tenant has assigned more units than it purchased. Remove a seat or increase the license count.',
+  DependencyViolation:
+    'This SKU depends on another license or service plan that the user does not have.',
+  CoexistenceViolation:
+    'The SKU conflicts with another assigned SKU or service plan. Remove the overlap to proceed.',
+  ProhibitedInRegion:
+    'The user’s usage location does not allow this SKU. Update the usage location or skip the assignment.',
+  ConsumerSubscription:
+    'The SKU is intended for personal accounts and cannot be assigned in this tenant.',
+  ServicePlanConflict:
+    'A service plan inside the SKU conflicts with another license granted to the user.',
+  PendingInput:
+    'Microsoft Graph is still processing this change. Check again shortly.',
+};
+
 export function LicensingDashboard({ skus }: { skus: SkuUsageModel[] }) {
   const styles = useStyles();
   const [selectedSkuId, setSelectedSkuId] = React.useState<string | null>(null);
@@ -980,9 +997,16 @@ function UserLicenseAssignmentStatePanel({
             State: {state.state ?? 'Unknown state'}
           </Text>
           {state.error ? (
-            <Text size={200} className={styles.groupMeta}>
-              Error: {state.error}
-            </Text>
+            <>
+              <Text size={200} className={styles.groupMeta}>
+                Error: {state.error}
+              </Text>
+              {getLicenseErrorDescription(state.error) ? (
+                <Text size={200} className={styles.errorEmptyState}>
+                  {getLicenseErrorDescription(state.error)}
+                </Text>
+              ) : null}
+            </>
           ) : null}
           <Text size={200} className={styles.groupMeta}>
             Assigned by:{' '}
@@ -1005,4 +1029,11 @@ function formatDate(value: string) {
     return value;
   }
   return new Date(parsed).toLocaleString();
+}
+
+function getLicenseErrorDescription(code?: string) {
+  if (!code) {
+    return undefined;
+  }
+  return licenseAssignmentErrorDescriptions[code] ?? undefined;
 }
