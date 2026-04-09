@@ -4,7 +4,7 @@
 
 The native licensing experience in admin.microsoft.com can become slow and difficult to navigate in large tenants.
 
-This dashboard uses optimised Microsoft Graph queries to surface licensing data in a fast, structured, and more usable way.
+This dashboard uses optimised Microsoft Graph queries to surface licensing data in a fast, structured, and in a more usable way.
 
 It provides clear visibility into how licenses are assigned, consumed, and where issues exist across the tenant.
 
@@ -20,6 +20,7 @@ These views make it easier to understand:
 The following views are planned but not yet implemented:
 
 - Pending license assignment actions
+- It does not surface direct license assignment.
 
 <p align="center">
   <img src="./public/docs/insights-hero.png" alt="Insights dashboard" width="800" />
