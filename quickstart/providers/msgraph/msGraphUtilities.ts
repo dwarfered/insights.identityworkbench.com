@@ -1,6 +1,8 @@
 import {
   BrowserAuthError,
   InteractionRequiredAuthError,
+  type AuthenticationResult,
+  type SilentRequest,
 } from '@azure/msal-browser';
 import {
   ensureMsalInitialized,
@@ -36,11 +38,17 @@ export class NoActiveAccountError extends Error {
   }
 }
 
-export async function getMsGraphAccessToken(): Promise<string> {
-  // Ensure MSAL is fully initialized before using any API on the instance
+type TokenAcquisitionOptions = {
+  suppressInteractive?: boolean;
+};
+
+export async function acquireTokenSilentWithFallback(
+  requestOverrides: Partial<SilentRequest> = {},
+  options: TokenAcquisitionOptions = {},
+): Promise<AuthenticationResult> {
   await ensureMsalInitialized();
 
-  let account = msalInstance.getActiveAccount();
+  let account = requestOverrides.account ?? msalInstance.getActiveAccount();
 
   if (!account) {
     const accounts = msalInstance.getAllAccounts();
@@ -52,12 +60,14 @@ export async function getMsGraphAccessToken(): Promise<string> {
     }
   }
 
+  const silentRequest: SilentRequest = {
+    ...loginRequest,
+    ...requestOverrides,
+    account,
+  };
+
   try {
-    const response = await msalInstance.acquireTokenSilent({
-      ...loginRequest,
-      account,
-    });
-    return response.accessToken;
+    return await msalInstance.acquireTokenSilent(silentRequest);
   } catch (error: unknown) {
     const errorCode =
       typeof error === 'object' && error && 'errorCode' in error
@@ -72,8 +82,11 @@ export async function getMsGraphAccessToken(): Promise<string> {
         ));
 
     if (requiresInteractive) {
+      if (options.suppressInteractive) {
+        throw error instanceof Error ? error : new Error(String(error));
+      }
       if (isInteractiveTokenPending()) {
-        return new Promise<never>(() => {}) as Promise<string>;
+        return new Promise<never>(() => {}) as Promise<AuthenticationResult>;
       }
       setInteractiveTokenPending(true);
       console.warn(
@@ -82,16 +95,23 @@ export async function getMsGraphAccessToken(): Promise<string> {
       );
       try {
         await msalInstance.acquireTokenRedirect(
-          account ? { ...loginRequest, account } : { ...loginRequest },
+          account
+            ? { ...loginRequest, ...requestOverrides, account }
+            : { ...loginRequest, ...requestOverrides },
         );
       } catch (redirectError) {
         setInteractiveTokenPending(false);
         throw redirectError;
       }
-      return new Promise<never>(() => {}) as Promise<string>;
+      return new Promise<never>(() => {}) as Promise<AuthenticationResult>;
     } else if (process.env.NODE_ENV === 'development') {
       console.error('MSAL: Silent token acquisition failed', error);
     }
     throw error;
   }
+}
+
+export async function getMsGraphAccessToken(): Promise<string> {
+  const response = await acquireTokenSilentWithFallback();
+  return response.accessToken;
 }

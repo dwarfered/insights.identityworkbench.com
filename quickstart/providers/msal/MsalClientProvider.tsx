@@ -1,6 +1,13 @@
 'use client';
 
-import { ReactNode, useEffect } from 'react';
+import {
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { MsalProvider } from '@azure/msal-react';
 import {
   ensureMsalInitialized,
@@ -42,16 +49,64 @@ async function initializeMsalClient() {
   }
 }
 
+type MsalReadinessContextValue = {
+  isReady: boolean;
+  error: Error | null;
+};
+
+const MsalReadinessContext = createContext<MsalReadinessContextValue>({
+  isReady: false,
+  error: null,
+});
+
+export function useMsalReadiness() {
+  return useContext(MsalReadinessContext);
+}
+
 export default function MsalClientProvider({
   children,
 }: {
   children: ReactNode;
 }) {
+  const [status, setStatus] = useState<'initializing' | 'ready' | 'error'>(
+    'initializing',
+  );
+  const [initError, setInitError] = useState<Error | null>(null);
+
   useEffect(() => {
-    initializeMsalClient().catch((err) => {
-      console.error('MSAL initialization failed', err);
-    });
+    let cancelled = false;
+
+    initializeMsalClient()
+      .then(() => {
+        if (!cancelled) {
+          setStatus('ready');
+          setInitError(null);
+        }
+      })
+      .catch((err) => {
+        console.error('MSAL initialization failed', err);
+        if (!cancelled) {
+          setStatus('error');
+          setInitError(err instanceof Error ? err : new Error(String(err)));
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  return <MsalProvider instance={msalInstance}>{children}</MsalProvider>;
+  const contextValue = useMemo<MsalReadinessContextValue>(
+    () => ({
+      isReady: status === 'ready',
+      error: initError,
+    }),
+    [status, initError],
+  );
+
+  return (
+    <MsalReadinessContext.Provider value={contextValue}>
+      <MsalProvider instance={msalInstance}>{children}</MsalProvider>
+    </MsalReadinessContext.Provider>
+  );
 }

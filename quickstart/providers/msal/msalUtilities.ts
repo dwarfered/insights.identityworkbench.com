@@ -5,6 +5,7 @@ import {
 } from '@azure/msal-browser';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import { loginRequest, msalInstance } from './msalAuthConfig';
+import { acquireTokenSilentWithFallback } from '../msgraph/msGraphUtilities';
 
 export class CustomNavigationClient extends NavigationClient {
   private router: AppRouterInstance;
@@ -48,11 +49,13 @@ export const hasScopes = async (
   }
 
   try {
-    const response: AuthenticationResult =
-      await msalInstance.acquireTokenSilent({
+    const response = await acquireTokenSilentWithFallback(
+      {
         account,
         scopes: requiredScopes,
-      });
+      },
+      { suppressInteractive: true },
+    );
 
     const tokenScopes = response.scopes || [];
     return requiredScopes.every((scope) => tokenScopes.includes(scope));

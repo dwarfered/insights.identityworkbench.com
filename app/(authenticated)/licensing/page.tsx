@@ -17,6 +17,7 @@ import {
   LicensingDashboard,
   type SkuUsageModel,
 } from './components/LicensingDashboard';
+import { useMsalReadiness } from '@/quickstart/providers/msal/MsalClientProvider';
 
 const licenseScopes = [
   'LicenseAssignment.Read.All',
@@ -47,12 +48,28 @@ function mapSubscribedSkuToUsageModel(sku: SubscribedSku): SkuUsageModel {
 }
 
 export default function LicensingPage() {
+  const { isReady: isMsalReady, error: msalError } = useMsalReadiness();
   const { hasScopes, isChecking, requestConsent } = useScopes(licenseScopes);
-  const shouldFetchSkus = hasScopes === true;
+  const shouldFetchSkus = isMsalReady && hasScopes === true;
   const { skus, error, isLoading } = useSubscribedSkusQuery(shouldFetchSkus);
 
   const isAwaitingScopesDecision = hasScopes === null;
-  const isBusy = isChecking || isLoading || isAwaitingScopesDecision;
+  const isBusy =
+    !isMsalReady || isChecking || isLoading || isAwaitingScopesDecision;
+
+  if (msalError) {
+    return (
+      <Card>
+        <CardHeader
+          header={<Title3>Microsoft identity unavailable</Title3>}
+          description='MSAL failed to initialize. Refresh the page or sign out and back in.'
+        />
+        <Text>
+          {msalError instanceof Error ? msalError.message : String(msalError)}
+        </Text>
+      </Card>
+    );
+  }
 
   if (isBusy) {
     return (

@@ -7,6 +7,7 @@ import {
   InteractionRequiredAuthError,
   RedirectRequest,
 } from '@azure/msal-browser';
+import { acquireTokenSilentWithFallback } from '@/quickstart/providers/msgraph/msGraphUtilities';
 
 export function useScopes(requiredScopes: string[]) {
   const { instance, accounts, inProgress } = useMsal();
@@ -45,10 +46,13 @@ export function useScopes(requiredScopes: string[]) {
       }
 
       try {
-        await instance.acquireTokenSilent({
-          account,
-          scopes: requiredScopes,
-        });
+        await acquireTokenSilentWithFallback(
+          {
+            account,
+            scopes: requiredScopes,
+          },
+          { suppressInteractive: true },
+        );
 
         if (!cancelled) {
           setHasScopes(true);
