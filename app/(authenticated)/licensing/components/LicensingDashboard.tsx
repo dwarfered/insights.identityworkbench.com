@@ -538,6 +538,14 @@ function SkuLicenseGroupsCard({ skuId }: { skuId: string }) {
   const styles = useStyles();
   const { groups, isLoading, error } = useSkuLicenseGroupsQuery(skuId);
   const totalGroups = groups.length;
+  const groupNameLookup = React.useMemo(() => {
+    return groups.reduce<Record<string, string>>((acc, group) => {
+      if (group.id) {
+        acc[group.id.toLowerCase()] = group.displayName ?? '';
+      }
+      return acc;
+    }, {});
+  }, [groups]);
 
   if (isLoading) {
     return (
@@ -582,7 +590,12 @@ function SkuLicenseGroupsCard({ skuId }: { skuId: string }) {
       />
       <div className={styles.groupList}>
         {groups.map((group) => (
-          <LicenseGroupRow key={group.id} group={group} skuId={skuId} />
+          <LicenseGroupRow
+            key={group.id}
+            group={group}
+            skuId={skuId}
+            groupNameLookup={groupNameLookup}
+          />
         ))}
       </div>
     </Card>
@@ -592,9 +605,11 @@ function SkuLicenseGroupsCard({ skuId }: { skuId: string }) {
 function LicenseGroupRow({
   group,
   skuId,
+  groupNameLookup,
 }: {
   group: GroupWithMemberCount;
   skuId: string;
+  groupNameLookup: Record<string, string>;
 }) {
   const styles = useStyles();
   return (
@@ -624,6 +639,7 @@ function LicenseGroupRow({
           groupId={group.id}
           groupName={group.displayName}
           skuId={skuId}
+          groupNameLookup={groupNameLookup}
         />
       </div>
     </div>
@@ -634,10 +650,12 @@ function GroupLicenseErrorInsights({
   groupId,
   groupName,
   skuId,
+  groupNameLookup,
 }: {
   groupId: string;
   groupName?: string;
   skuId: string;
+  groupNameLookup: Record<string, string>;
 }) {
   const styles = useStyles();
   const [dialogOpen, setDialogOpen] = React.useState(false);
@@ -775,6 +793,7 @@ function GroupLicenseErrorInsights({
                             <UserLicenseAssignmentStatePanel
                               userId={selectedUser.id}
                               skuId={skuId}
+                              groupNameLookup={groupNameLookup}
                             />
                           </>
                         ) : (
@@ -947,9 +966,11 @@ function SkuEmployeeTypeBreakdownCard({ skuId }: { skuId: string }) {
 function UserLicenseAssignmentStatePanel({
   userId,
   skuId,
+  groupNameLookup,
 }: {
   userId: string;
   skuId: string;
+  groupNameLookup: Record<string, string>;
 }) {
   const styles = useStyles();
   const { assignmentStates, error, isLoading } =
@@ -1007,7 +1028,7 @@ function UserLicenseAssignmentStatePanel({
           ) : null}
           <Text size={200} className={styles.groupMeta}>
             Assigned by:{' '}
-            {state.assignedByGroup ?? 'Direct or unknown assignment'}
+            {formatAssignedBy(state.assignedByGroup, groupNameLookup)}
           </Text>
           {state.lastUpdatedDateTime ? (
             <Text size={200} className={styles.groupMeta}>
@@ -1033,4 +1054,19 @@ function getLicenseErrorDescription(code?: string) {
     return undefined;
   }
   return licenseAssignmentErrorDescriptions[code] ?? undefined;
+}
+
+function formatAssignedBy(
+  groupId: string | undefined,
+  groupNameLookup: Record<string, string>,
+) {
+  if (!groupId) {
+    return 'Direct or unknown assignment';
+  }
+  const lookupKey = groupId.toLowerCase();
+  const groupName = groupNameLookup[lookupKey];
+  if (groupName && groupName.length) {
+    return `${groupName} (${groupId})`;
+  }
+  return groupId;
 }
