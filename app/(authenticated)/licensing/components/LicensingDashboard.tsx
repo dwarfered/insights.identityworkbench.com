@@ -387,6 +387,18 @@ export function LicensingDashboard({ skus }: { skus: SkuUsageModel[] }) {
     setFilterText('');
     setHasTypedFilter(false);
   }, []);
+  const handleComboboxPointerDown = React.useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      if (
+        event.target instanceof HTMLInputElement &&
+        document.activeElement === event.target
+      ) {
+        setFilterText('');
+        setHasTypedFilter(false);
+      }
+    },
+    [],
+  );
 
   return (
     <div className={styles.dashboard}>
@@ -398,6 +410,7 @@ export function LicensingDashboard({ skus }: { skus: SkuUsageModel[] }) {
           selectedOptions={selectedSkuId ? [selectedSkuId] : []}
           value={filterText}
           onFocus={handleComboboxFocus}
+          onPointerDown={handleComboboxPointerDown}
           onInput={(event, data?: { value?: string }) => {
             const nextValue =
               data?.value ??
