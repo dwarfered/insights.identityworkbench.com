@@ -310,13 +310,15 @@ const licenseAssignmentErrorDescriptions: Record<string, string> = {
   CoexistenceViolation:
     'The SKU conflicts with another assigned SKU or service plan. Remove the overlap to proceed.',
   ProhibitedInRegion:
-    'The user’s usage location does not allow this SKU. Update the usage location or skip the assignment.',
+    'The users usage location does not allow this SKU. Update the usage location or skip the assignment.',
   ConsumerSubscription:
     'The SKU is intended for personal accounts and cannot be assigned in this tenant.',
   ServicePlanConflict:
     'A service plan inside the SKU conflicts with another license granted to the user.',
   PendingInput:
     'Microsoft Graph is still processing this change. Check again shortly.',
+  UniquenessViolation:
+    'A required attribute (often the user principal name or email) conflicts with an existing account.',
 };
 
 export function LicensingDashboard({ skus }: { skus: SkuUsageModel[] }) {
@@ -755,10 +757,7 @@ function GroupLicenseErrorInsights({
                                 'Unknown user'}
                             </Text>
                             {member.userPrincipalName ? (
-                              <Text
-                                size={200}
-                                className={styles.errorUserMeta}
-                              >
+                              <Text size={200} className={styles.errorUserMeta}>
                                 {member.userPrincipalName}
                               </Text>
                             ) : null}
@@ -993,9 +992,7 @@ function UserLicenseAssignmentStatePanel({
           key={`${state.skuId}-${state.assignedByGroup ?? 'direct'}-${index}`}
           className={styles.assignmentStateRow}
         >
-          <Text weight='semibold'>
-            State: {state.state ?? 'Unknown state'}
-          </Text>
+          <Text weight='semibold'>State: {state.state ?? 'Unknown state'}</Text>
           {state.error ? (
             <>
               <Text size={200} className={styles.groupMeta}>
