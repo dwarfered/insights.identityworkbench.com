@@ -745,43 +745,17 @@ function GroupLicenseErrorInsights({
                                 {member.userPrincipalName}
                               </Text>
                             ) : null}
-                            {member.mail ? (
-                              <Text
-                                size={200}
-                                className={styles.errorUserMeta}
-                              >
-                                {member.mail}
-                              </Text>
-                            ) : null}
                           </button>
                         ))}
                       </div>
                       <div className={styles.errorDetailsPanel}>
                         {selectedUser ? (
                           <>
-                            <div>
-                              <Text weight='semibold'>
-                                {selectedUser.displayName ??
-                                  selectedUser.userPrincipalName ??
-                                  'Selected user'}
-                              </Text>
-                              {selectedUser.userPrincipalName ? (
-                                <Text
-                                  size={200}
-                                  className={styles.errorUserMeta}
-                                >
-                                  {selectedUser.userPrincipalName}
-                                </Text>
-                              ) : null}
-                              {selectedUser.mail ? (
-                                <Text
-                                  size={200}
-                                  className={styles.errorUserMeta}
-                                >
-                                  {selectedUser.mail}
-                                </Text>
-                              ) : null}
-                            </div>
+                            <Text weight='semibold'>
+                              {selectedUser.displayName ??
+                                selectedUser.userPrincipalName ??
+                                'Selected user'}
+                            </Text>
                             <UserLicenseAssignmentStatePanel
                               userId={selectedUser.id}
                               skuId={skuId}
