@@ -377,6 +377,10 @@ export function LicensingDashboard({ skus }: { skus: SkuUsageModel[] }) {
       setHasTypedFilter(false);
     }
   }, [selectedSku]);
+  const handleComboboxFocus = React.useCallback(() => {
+    setFilterText('');
+    setHasTypedFilter(false);
+  }, []);
 
   return (
     <div className={styles.dashboard}>
@@ -387,6 +391,7 @@ export function LicensingDashboard({ skus }: { skus: SkuUsageModel[] }) {
           disabled={!sortedSkus.length}
           selectedOptions={selectedSkuId ? [selectedSkuId] : []}
           value={filterText}
+          onFocus={handleComboboxFocus}
           onInput={(event, data?: { value?: string }) => {
             const nextValue =
               data?.value ??
