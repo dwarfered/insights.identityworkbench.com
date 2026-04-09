@@ -151,6 +151,13 @@ const useStyles = makeStyles({
   groupCount: {
     color: tokens.colorNeutralForeground2,
   },
+  memberAndStatusRow: {
+    display: 'flex',
+    alignItems: 'center',
+    columnGap: tokens.spacingHorizontalS,
+    rowGap: tokens.spacingVerticalXXS,
+    flexWrap: 'wrap',
+  },
   groupMeta: {
     color: tokens.colorNeutralForeground3,
   },
@@ -645,19 +652,19 @@ function LicenseGroupRow({
             {group.description}
           </Text>
         ) : null}
-        <Text size={200} className={styles.groupCount}>
-          {group.memberCount !== null
-            ? `${group.memberCount.toLocaleString()} member${group.memberCount === 1 ? '' : 's'}`
-            : 'Member count unavailable'}
-        </Text>
-      </div>
-      <div className={styles.groupRowActions}>
-        <GroupLicenseErrorInsights
-          groupId={group.id}
-          groupName={group.displayName}
-          skuId={skuId}
-          groupNameLookup={groupNameLookup}
-        />
+        <div className={styles.memberAndStatusRow}>
+          <Text size={200} className={styles.groupCount}>
+            {group.memberCount !== null
+              ? `${group.memberCount.toLocaleString()} member${group.memberCount === 1 ? '' : 's'}`
+              : 'Member count unavailable'}
+          </Text>
+          <GroupLicenseErrorInsights
+            groupId={group.id}
+            groupName={group.displayName}
+            skuId={skuId}
+            groupNameLookup={groupNameLookup}
+          />
+        </div>
       </div>
     </div>
   );
@@ -718,28 +725,35 @@ function GroupLicenseErrorInsights({
 
   return (
     <>
-      {isLoading ? (
-        <Spinner aria-label='Checking for license errors' />
-      ) : (
-        <Badge
-          appearance={hasIssues ? 'filled' : 'outline'}
-          color={hasIssues ? 'danger' : 'brand'}
-          className={styles.errorBadge}
-        >
-          {hasIssues
-            ? `${issueCount.toLocaleString()} issue${issueCount === 1 ? '' : 's'}`
-            : 'No license errors'}
-        </Badge>
-      )}
-      {hasIssues ? (
-        <Button
-          appearance='secondary'
-          size='small'
-          onClick={() => setDialogOpen(true)}
-        >
-          View affected users
-        </Button>
-      ) : null}
+      <div className={styles.groupRowActions}>
+        {isLoading ? (
+          <Spinner
+            aria-label='Checking for license errors'
+            size='extra-small'
+          />
+        ) : (
+          <>
+            <Badge
+              appearance={hasIssues ? 'filled' : 'outline'}
+              color={hasIssues ? 'danger' : 'brand'}
+              className={styles.errorBadge}
+            >
+              {hasIssues
+                ? `${issueCount.toLocaleString()} issue${issueCount === 1 ? '' : 's'}`
+                : 'No license errors'}
+            </Badge>
+            {hasIssues ? (
+              <Button
+                appearance='secondary'
+                size='small'
+                onClick={() => setDialogOpen(true)}
+              >
+                View affected users
+              </Button>
+            ) : null}
+          </>
+        )}
+      </div>
       <Dialog
         open={dialogOpen}
         onOpenChange={(_, data) => {
