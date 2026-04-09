@@ -151,13 +151,6 @@ const useStyles = makeStyles({
   groupCount: {
     color: tokens.colorNeutralForeground2,
   },
-  memberAndStatusRow: {
-    display: 'flex',
-    alignItems: 'center',
-    columnGap: tokens.spacingHorizontalS,
-    rowGap: tokens.spacingVerticalXXS,
-    flexWrap: 'wrap',
-  },
   groupMeta: {
     color: tokens.colorNeutralForeground3,
   },
@@ -652,19 +645,17 @@ function LicenseGroupRow({
             {group.description}
           </Text>
         ) : null}
-        <div className={styles.memberAndStatusRow}>
-          <Text size={200} className={styles.groupCount}>
-            {group.memberCount !== null
-              ? `${group.memberCount.toLocaleString()} member${group.memberCount === 1 ? '' : 's'}`
-              : 'Member count unavailable'}
-          </Text>
-          <GroupLicenseErrorInsights
-            groupId={group.id}
-            groupName={group.displayName}
-            skuId={skuId}
-            groupNameLookup={groupNameLookup}
-          />
-        </div>
+        <Text size={200} className={styles.groupCount}>
+          {group.memberCount !== null
+            ? `${group.memberCount.toLocaleString()} member${group.memberCount === 1 ? '' : 's'}`
+            : 'Member count unavailable'}
+        </Text>
+        <GroupLicenseErrorInsights
+          groupId={group.id}
+          groupName={group.displayName}
+          skuId={skuId}
+          groupNameLookup={groupNameLookup}
+        />
       </div>
     </div>
   );
