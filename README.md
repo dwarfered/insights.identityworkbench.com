@@ -2,23 +2,23 @@
 
 ## Entra Licensing
 
-The native licensing experience in admin.microsoft.com can become slow and difficult to work with in large tenants.
+The native licensing experience in admin.microsoft.com can become slow and difficult to navigate in large tenants.
 
-This dashboard aims to reduce that friction by using optimised Microsoft Graph queries to surface licensing data in a more responsive and usable way.
+This dashboard uses optimised Microsoft Graph queries to surface licensing data in a fast, structured, and more usable way.
 
-3/4/26 Added licensing-focused insights to show how licenses are assigned and consumed across the tenant.
+It provides clear visibility into how licenses are assigned, consumed, and where issues exist across the tenant.
 
-These views are designed to make it easier to understand:
+These views make it easier to understand:
 
 - Which users are assigned specific SKUs
 - How licenses are distributed across employee types (e.g. employee, contractor, service accounts)
-- Which groups are being used to assign licenses
+- Which groups are used to assign licenses
+- Where license assignment errors exist, including breakdowns by group, SKU, and error type
 
 ## Pending Actions
 
 The following views are planned but not yet implemented:
 
-- License assignment failures
 - Pending license assignment actions
 
 <p align="center">
