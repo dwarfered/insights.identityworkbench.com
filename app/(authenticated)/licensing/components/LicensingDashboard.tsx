@@ -72,6 +72,10 @@ const useStyles = makeStyles({
     alignItems: 'center',
     gap: tokens.spacingHorizontalS,
   },
+  licensePicker: {
+    minWidth: '360px',
+    flex: '1 1 520px',
+  },
   card: {
     borderRadius: tokens.borderRadiusXLarge,
     padding: tokens.spacingHorizontalL,
@@ -409,6 +413,7 @@ export function LicensingDashboard({ skus }: { skus: SkuUsageModel[] }) {
           disabled={!sortedSkus.length}
           selectedOptions={selectedSkuId ? [selectedSkuId] : []}
           value={filterText}
+          className={styles.licensePicker}
           onFocus={handleComboboxFocus}
           onPointerDown={handleComboboxPointerDown}
           onInput={(event, data?: { value?: string }) => {
