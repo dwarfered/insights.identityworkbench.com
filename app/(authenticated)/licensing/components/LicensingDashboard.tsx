@@ -312,6 +312,13 @@ const capabilityStatusDescriptions: Record<string, string> = {
     'Microsoft disabled the SKU for this tenant until billing or compliance issues are resolved, so users cannot access it.',
 };
 
+const appliesToDescriptions: Record<string, string> = {
+  User:
+    'User-scoped SKUs are assigned to individual identities via direct or group-based licensing.',
+  Company:
+    'Company-scoped SKUs apply at the tenant level (e.g., shared capacity) and are not assigned to individual users.',
+};
+
 const licenseAssignmentErrorDescriptions: Record<string, string> = {
   CountViolation:
     'The tenant has assigned more units than it purchased. Remove a seat, increase the license count, or reprocess the user assignment. In some cases, the assignment may remain in error until it is manually reprocessed even if capacity becomes available.',
@@ -515,9 +522,17 @@ function SkuUsageCard({
             </Text>
           }
           description={
-            <Text size={200} className={styles.subText}>
-              {sku.appliesTo}
-            </Text>
+            <InfoLabel
+              info={
+                appliesToDescriptions[sku.appliesTo] ??
+                'Represents how Microsoft Graph scopes this SKU in Entra ID.'
+              }
+              className={styles.statusInfoLabel}
+            >
+              <Text size={200} className={styles.subText}>
+                {sku.appliesTo}
+              </Text>
+            </InfoLabel>
           }
         />
         {statusNode}
