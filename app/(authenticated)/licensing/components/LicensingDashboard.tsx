@@ -312,6 +312,13 @@ const capabilityStatusDescriptions: Record<string, string> = {
     'Microsoft disabled the SKU for this tenant until billing or compliance issues are resolved, so users cannot access it.',
 };
 
+const appliesToDescriptions: Record<string, string> = {
+  User:
+    'User-scoped SKUs are assigned to individual identities via direct or group-based licensing.',
+  Company:
+    'Company-scoped SKUs apply at the tenant level (e.g., shared capacity) and are not assigned to individual users.',
+};
+
 const licenseAssignmentErrorDescriptions: Record<string, string> = {
   CountViolation:
     'The tenant has assigned more units than it purchased. Remove a seat, increase the license count, or reprocess the user assignment. In some cases, the assignment may remain in error until it is manually reprocessed even if capacity becomes available.',
@@ -451,15 +458,22 @@ export function LicensingDashboard({ skus }: { skus: SkuUsageModel[] }) {
       </div>
 
       {selectedSku ? (
-        <>
-          <div className={styles.root}>
-            <SkuUsageCard sku={selectedSku} />
-          </div>
-          <div className={styles.insightsRow}>
-            <SkuLicenseGroupsCard skuId={selectedSku.skuId} />
-            <SkuEmployeeTypeBreakdownCard skuId={selectedSku.skuId} />
-          </div>
-        </>
+        (() => {
+          const isCompanySku = selectedSku.appliesTo === 'Company';
+          return (
+            <>
+              <div className={styles.root}>
+                <SkuUsageCard sku={selectedSku} isCompanySku={isCompanySku} />
+              </div>
+              {!isCompanySku ? (
+                <div className={styles.insightsRow}>
+                  <SkuLicenseGroupsCard skuId={selectedSku.skuId} />
+                  <SkuEmployeeTypeBreakdownCard skuId={selectedSku.skuId} />
+                </div>
+              ) : null}
+            </>
+          );
+        })()
       ) : (
         <Card>
           <CardHeader
@@ -474,7 +488,13 @@ export function LicensingDashboard({ skus }: { skus: SkuUsageModel[] }) {
   );
 }
 
-function SkuUsageCard({ sku }: { sku: SkuUsageModel }) {
+function SkuUsageCard({
+  sku,
+  isCompanySku = false,
+}: {
+  sku: SkuUsageModel;
+  isCompanySku?: boolean;
+}) {
   const styles = useStyles();
   const available = getAvailable(sku);
   const percentConsumed = getPercentConsumed(sku);
@@ -502,24 +522,43 @@ function SkuUsageCard({ sku }: { sku: SkuUsageModel }) {
             </Text>
           }
           description={
-            <Text size={200} className={styles.subText}>
-              {sku.appliesTo}
-            </Text>
+            <InfoLabel
+              info={
+                appliesToDescriptions[sku.appliesTo] ??
+                'Represents how Microsoft Graph scopes this SKU in Entra ID.'
+              }
+              className={styles.statusInfoLabel}
+            >
+              <Text size={200} className={styles.subText}>
+                {sku.appliesTo}
+              </Text>
+            </InfoLabel>
           }
         />
         {statusNode}
       </div>
 
       <div className={styles.statBlock}>
-        <Text className={styles.bigStat}>
-          {sku.consumed} / {sku.enabled}
-        </Text>
-        <Text size={300} className={styles.subText}>
-          Assigned licenses
-        </Text>
+        {isCompanySku ? (
+          <>
+            <Text className={styles.bigStat}>{available}</Text>
+            <Text size={300} className={styles.subText}>
+              Available licenses
+            </Text>
+          </>
+        ) : (
+          <>
+            <Text className={styles.bigStat}>
+              {sku.consumed} / {sku.enabled}
+            </Text>
+            <Text size={300} className={styles.subText}>
+              Assigned licenses
+            </Text>
+          </>
+        )}
       </div>
 
-      <ProgressBar value={percentConsumed} />
+      {!isCompanySku ? <ProgressBar value={percentConsumed} /> : null}
 
       <div className={styles.metaGrid}>
         <div className={styles.metric}>
