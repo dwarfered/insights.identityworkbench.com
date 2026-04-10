@@ -313,8 +313,7 @@ const capabilityStatusDescriptions: Record<string, string> = {
 };
 
 const appliesToDescriptions: Record<string, string> = {
-  User:
-    'User-scoped SKUs are assigned to individual identities via direct or group-based licensing.',
+  User: 'User-scoped SKUs are assigned to individual identities via direct or group-based licensing.',
   Company:
     'Company-scoped SKUs apply at the tenant level (e.g., shared capacity) and are not assigned to individual users.',
 };
@@ -543,7 +542,7 @@ function SkuUsageCard({
           <>
             <Text className={styles.bigStat}>{available}</Text>
             <Text size={300} className={styles.subText}>
-              Available licenses
+              Available units
             </Text>
           </>
         ) : (
