@@ -451,15 +451,22 @@ export function LicensingDashboard({ skus }: { skus: SkuUsageModel[] }) {
       </div>
 
       {selectedSku ? (
-        <>
-          <div className={styles.root}>
-            <SkuUsageCard sku={selectedSku} />
-          </div>
-          <div className={styles.insightsRow}>
-            <SkuLicenseGroupsCard skuId={selectedSku.skuId} />
-            <SkuEmployeeTypeBreakdownCard skuId={selectedSku.skuId} />
-          </div>
-        </>
+        (() => {
+          const isCompanySku = selectedSku.appliesTo === 'Company';
+          return (
+            <>
+              <div className={styles.root}>
+                <SkuUsageCard sku={selectedSku} isCompanySku={isCompanySku} />
+              </div>
+              {!isCompanySku ? (
+                <div className={styles.insightsRow}>
+                  <SkuLicenseGroupsCard skuId={selectedSku.skuId} />
+                  <SkuEmployeeTypeBreakdownCard skuId={selectedSku.skuId} />
+                </div>
+              ) : null}
+            </>
+          );
+        })()
       ) : (
         <Card>
           <CardHeader
@@ -474,7 +481,13 @@ export function LicensingDashboard({ skus }: { skus: SkuUsageModel[] }) {
   );
 }
 
-function SkuUsageCard({ sku }: { sku: SkuUsageModel }) {
+function SkuUsageCard({
+  sku,
+  isCompanySku = false,
+}: {
+  sku: SkuUsageModel;
+  isCompanySku?: boolean;
+}) {
   const styles = useStyles();
   const available = getAvailable(sku);
   const percentConsumed = getPercentConsumed(sku);
@@ -511,15 +524,26 @@ function SkuUsageCard({ sku }: { sku: SkuUsageModel }) {
       </div>
 
       <div className={styles.statBlock}>
-        <Text className={styles.bigStat}>
-          {sku.consumed} / {sku.enabled}
-        </Text>
-        <Text size={300} className={styles.subText}>
-          Assigned licenses
-        </Text>
+        {isCompanySku ? (
+          <>
+            <Text className={styles.bigStat}>{available}</Text>
+            <Text size={300} className={styles.subText}>
+              Available licenses
+            </Text>
+          </>
+        ) : (
+          <>
+            <Text className={styles.bigStat}>
+              {sku.consumed} / {sku.enabled}
+            </Text>
+            <Text size={300} className={styles.subText}>
+              Assigned licenses
+            </Text>
+          </>
+        )}
       </div>
 
-      <ProgressBar value={percentConsumed} />
+      {!isCompanySku ? <ProgressBar value={percentConsumed} /> : null}
 
       <div className={styles.metaGrid}>
         <div className={styles.metric}>
